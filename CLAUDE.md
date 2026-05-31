@@ -35,6 +35,19 @@ Before marking a documentation-related task complete:
 - do not leave two competing "source of truth" locations for the same concept
 - add an execution note if a planned name or location changed
 
+## Config Identity Checks
+
+When code loads a config by an external selector such as a client slug, folder
+name, or command argument, the validated config's internal ID must match that
+selector unless the plan explicitly says aliases are supported.
+
+Before marking config loading complete:
+
+- reject mismatches between path/argument IDs and internal config IDs
+- add tests for the mismatch case
+- make CLI success output use the requested ID and validated internal ID only
+  when they are known to match
+
 ## Verification Commands
 
 Verification commands in plans, READMEs, and PR descriptions must be
