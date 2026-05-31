@@ -35,6 +35,22 @@ Before marking a documentation-related task complete:
 - do not leave two competing "source of truth" locations for the same concept
 - add an execution note if a planned name or location changed
 
+## Verification Commands
+
+Verification commands in plans, READMEs, and PR descriptions must be
+copy-paste-safe for the shared development machine and must satisfy any version
+constraints declared by the repo.
+
+Before marking verification complete:
+
+- check the actual tool version used, e.g. `node --version`, `pnpm --version`,
+  or `python3.11 --version`
+- use the exact executable that satisfies the repo requirement
+- if a generic command like `python3` or `node` depends on shell setup, document
+  the setup or use the versioned executable instead
+- do not claim a command passed if it only passes in a different local
+  environment than the documented command
+
 ## Repository Boundary
 
 This repo owns private operations:
