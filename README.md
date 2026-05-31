@@ -98,7 +98,6 @@ The assistant must:
 Remaining backlog:
 
 4. Add website and manual lead intake.
-4. Add website and manual lead intake.
 5. Openclaw prompts and agent instructions.
 6. Lead classification and draft reply workflow.
 7. Telegram operator approval workflow.
