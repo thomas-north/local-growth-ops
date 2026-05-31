@@ -5,7 +5,7 @@ CLI entry point for validating a client assistant config.
 
 Usage::
 
-    python3 -m lead_hub.validate_client <client-slug>
+    python3.11 -m lead_hub.validate_client <client-slug>
 
 Exits 0 on success, 1 on validation error, 2 on usage error.
 """
@@ -24,7 +24,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args:
         print(
-            "Usage: python3 -m lead_hub.validate_client <client-slug>",
+            "Usage: python3.11 -m lead_hub.validate_client <client-slug>",
             file=sys.stderr,
         )
         return 2
