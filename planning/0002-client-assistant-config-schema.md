@@ -99,47 +99,63 @@ Validation rules:
 
 ## Tasks
 
-- [ ] Add `pyproject.toml` with package metadata, runtime dependencies, and
+- [x] Add `pyproject.toml` with package metadata, runtime dependencies, and
       pytest dev dependency.
-- [ ] Add a schema module, e.g. `lead_hub/schemas/client_config.py`.
-- [ ] Add a loader/validator module for `clients/<slug>/config.yaml`.
-- [ ] Add a command module so this works:
+- [x] Add a schema module, e.g. `lead_hub/schemas/client_config.py`.
+- [x] Add a loader/validator module for `clients/<slug>/config.yaml`.
+- [x] Add a command module so this works:
       `python3 -m lead_hub.validate_client example-client`.
-- [ ] Ensure the command exits non-zero and prints useful errors for invalid
+- [x] Ensure the command exits non-zero and prints useful errors for invalid
       configs.
-- [ ] Update `clients/example-client/config.yaml` only if required by the schema,
+- [x] Update `clients/example-client/config.yaml` only if required by the schema,
       keeping all data fictional.
-- [ ] Add tests for the valid example config.
-- [ ] Add tests for representative invalid configs:
+- [x] Add tests for the valid example config.
+- [x] Add tests for representative invalid configs:
       - missing required field
       - invalid slug
       - duplicate service slug
       - unsafe auto-send enabled
       - invalid follow-up ordering
-- [ ] Update README docs with the actual install/test/validation commands.
-- [ ] Update `lead_hub/README.md` to point to the new schema and validation
+- [x] Update README docs with the actual install/test/validation commands.
+- [x] Update `lead_hub/README.md` to point to the new schema and validation
       command.
-- [ ] Update this plan's checkboxes and execution notes as work completes.
+- [x] Update this plan's checkboxes and execution notes as work completes.
 
 ## Verification
 
-- [ ] `python3 -m pip install -e ".[dev]"` succeeds.
-- [ ] `python3 -m lead_hub.validate_client example-client` succeeds.
-- [ ] `python3 -m pytest tests/` succeeds.
-- [ ] `python3 -m compileall lead_hub openclaw tests` succeeds.
-- [ ] `rg -n "config.example.yaml|state/<" README.md docs lead_hub clients planning`
+- [x] `python3 -m pip install -e ".[dev]"` succeeds.
+- [x] `python3 -m lead_hub.validate_client example-client` succeeds.
+- [x] `python3 -m pytest tests/` succeeds (62 passed).
+- [x] `python3 -m compileall lead_hub openclaw tests` succeeds.
+- [x] `rg -n "config.example.yaml|state/<" README.md docs lead_hub clients planning`
       returns no stale source-of-truth references except historical execution
       notes that explicitly describe prior fixes.
-- [ ] `git status --short` shows only intentional changes before commit.
+- [x] `git status --short` shows only intentional changes before commit.
 
 ## Branch And PR
 
-- [ ] Create a branch named `codex/ops-client-config-schema`.
-- [ ] Commit with a clear message.
-- [ ] Open a draft pull request linked to issue #2.
-- [ ] PR description includes schema decisions, files changed, deferred work, and
+- [x] Create a branch named `codex/ops-client-config-schema`.
+- [x] Commit with a clear message.
+- [x] Open a draft pull request linked to issue #2.
+- [x] PR description includes schema decisions, files changed, deferred work, and
       verification commands run.
 
 ## Execution Notes
 
-Add notes here if implementation requires a meaningful deviation from the plan.
+**Build backend:** `pyproject.toml` initially used `setuptools.backends.legacy:build`
+which caused a `BackendUnavailable` error on the local environment despite
+setuptools 82 being installed. Switched to `setuptools.build_meta` — the stable
+backend that works identically for editable installs.
+
+**EmailStr → custom regex:** Pydantic's `EmailStr` requires the `email-validator`
+package and its `validate_email()` rejects reserved TLDs (`.invalid`, `.example`)
+even with `check_deliverability=False`, because the library treats certain special-use
+domains as structurally invalid. The plan explicitly requires example domains to be
+accepted. Replaced `EmailStr` with a custom `email_format` validator using a
+permissive regex (`^[^@\s]+@[^@\s]+\.[^@\s]+$`). This satisfies the plan's intent
+and keeps the dependency list clean (no `email-validator` needed).
+
+**Test: `"123"` slug case removed:** The parametrize list included `"123"` as an
+expected invalid slug, but the plan defines slugs as "lowercase letters, numbers,
+and hyphens" — making `123` valid. Removed the incorrect test case rather than
+adding an artificial restriction not in the plan.

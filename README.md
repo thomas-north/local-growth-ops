@@ -88,12 +88,13 @@ The assistant must:
 
 ## Development Status
 
-Bootstrap scaffold complete (plan 0001). Directory structure, example client
-placeholder, `.gitignore` coverage, and local-state documentation are in place.
+- Plan 0001 complete: bootstrap scaffold, directory structure, example client
+  placeholder, `.gitignore` coverage, local-state documentation.
+- Plan 0002 complete: Pydantic v2 client config schema, YAML loader,
+  `validate_client` command, 62-test suite.
 
 Remaining backlog:
 
-2. Define the client assistant config schema.
 3. Implement the lead hub storage model.
 4. Add website and manual lead intake.
 5. Openclaw prompts and agent instructions.
@@ -117,14 +118,28 @@ See [docs/OVERALL_PLAN.md](docs/OVERALL_PLAN.md) for the full phased plan.
 
 ## Future Commands
 
-The expected command shape is:
+Install dependencies (Python 3.11+):
 
 ```bash
-python -m lead_hub.validate_client example-client
-python -m lead_hub.manual_lead example-client
-python -m lead_hub.list_due_followups example-client
-python -m lead_hub.weekly_report example-client
+python3 -m pip install -e ".[dev]"
 ```
 
-These commands do not exist yet; they describe the target operator experience
-for the first implementation pass.
+Validate a client config:
+
+```bash
+python3 -m lead_hub.validate_client example-client
+```
+
+Run tests:
+
+```bash
+python3 -m pytest tests/
+```
+
+Planned commands (not yet implemented):
+
+```bash
+python3 -m lead_hub.manual_lead example-client
+python3 -m lead_hub.list_due_followups example-client
+python3 -m lead_hub.weekly_report example-client
+```

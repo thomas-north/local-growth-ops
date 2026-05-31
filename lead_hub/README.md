@@ -6,20 +6,40 @@ Deterministic lead ingestion and state management for the follow-up assistant.
 
 This package owns:
 
+- the client assistant config schema and validation
 - the normalised lead model (schema and validation)
 - per-client JSONL lead storage
 - lead status transitions
 - helper commands for manual lead entry, status queries, and reports
 
-## Planned Commands
+## Schema
 
-These will be implemented in plans 0003 and 0004:
+Client assistant configs are validated by `lead_hub.schemas.client_config`.
+The schema is implemented with Pydantic v2.
+
+## Commands
+
+### Validate a client config (plan 0002)
 
 ```bash
-python -m lead_hub.validate_client example-client
-python -m lead_hub.manual_lead example-client
-python -m lead_hub.list_due_followups example-client
-python -m lead_hub.weekly_report example-client
+python3 -m lead_hub.validate_client <client-slug>
+```
+
+Example:
+
+```bash
+python3 -m lead_hub.validate_client example-client
+# OK: 'example-client' config is valid (Bright Spark Electrical, 5 service(s))
+```
+
+Exits 0 on success, 1 on validation error, 2 on missing argument.
+
+### Planned commands (plans 0003 and 0004)
+
+```bash
+python3 -m lead_hub.manual_lead example-client
+python3 -m lead_hub.list_due_followups example-client
+python3 -m lead_hub.weekly_report example-client
 ```
 
 ## Lead Status Flow
