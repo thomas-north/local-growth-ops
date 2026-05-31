@@ -22,6 +22,19 @@ acts as product manager and planner by writing executable plans into
 9. Commit completed work on a branch and open a draft pull request unless the
    plan says otherwise.
 
+## Documentation Consistency
+
+When adding, renaming, or documenting a path, command, config file, state
+location, or workflow, update every affected README, plan, and docs page in the
+same PR.
+
+Before marking a documentation-related task complete:
+
+- search for the old name/path with `rg`
+- confirm examples match the files actually created
+- do not leave two competing "source of truth" locations for the same concept
+- add an execution note if a planned name or location changed
+
 ## Repository Boundary
 
 This repo owns private operations:
