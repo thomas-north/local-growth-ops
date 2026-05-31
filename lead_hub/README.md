@@ -38,10 +38,11 @@ New
 
 ## Storage
 
-MVP: one JSONL file per client at `state/<client-slug>/leads.jsonl`.
+MVP: one JSONL file per client at `/var/openclaw/clients/<client-slug>/leads.jsonl`
+on the Mac mini. This path is outside this git repository and is never committed.
 
-The `state/` directory is gitignored. It lives outside this repo on the Mac
-mini. See `docs/local-state.md`.
+See `docs/local-state.md` for the full directory layout and alternative dev
+paths.
 
 ## What Does Not Belong Here
 

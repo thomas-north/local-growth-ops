@@ -45,7 +45,7 @@ Default model:
 ```
 clients/
   example-client/           fictional placeholder client (config only — no real data)
-    config.example.yaml     assistant config template
+    config.yaml             fictional assistant config (template for real clients)
 lead_hub/                   deterministic lead ingestion and state scripts
   schemas/                  data models and validation (plan 0002 onward)
 openclaw/

@@ -5,8 +5,13 @@ Nothing described here should ever be committed.
 
 ## Mac Mini State Directory
 
-Suggested root: `/var/openclaw/` (or `~/openclaw-state/` if you prefer a home
-directory location). The structure mirrors the repo:
+Canonical root: **`/var/openclaw/`**
+
+Use `~/openclaw-state/` only as a temporary alternative on a dev machine that
+does not allow writing to `/var/`. All documentation, runbooks, and scripts
+should reference `/var/openclaw/` as the authoritative path.
+
+The structure is:
 
 ```
 /var/openclaw/

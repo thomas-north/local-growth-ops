@@ -59,4 +59,15 @@ Defer:
 
 ## Execution Notes
 
-Add notes here if implementation requires a meaningful deviation from the plan.
+**Post-review fixes (same PR, follow-up commit):**
+
+1. Config filename: initial commit created `config.example.yaml` and documented it
+   under that name in the top-level README, while `clients/example-client/README.md`
+   and `docs/local-state.md` expected `config.yaml`. Renamed to `config.yaml` (the
+   directory name already signals it is fictional) and updated the top-level README.
+
+2. Runtime state path: `lead_hub/README.md` referenced a relative `state/` path
+   that looked like it might live inside the repo. Updated to the canonical
+   `/var/openclaw/clients/<client-slug>/leads.jsonl` path. Also tightened
+   `docs/local-state.md` to name `/var/openclaw/` as the single authoritative
+   runtime root (with `~/openclaw-state/` noted only as a dev-machine fallback).
