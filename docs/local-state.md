@@ -63,5 +63,5 @@ Example (add to cron environment or `.env` file loaded at startup):
 
 ```bash
 source /var/openclaw/secrets/telegram.env
-python -m lead_hub.list_due_followups example-client
+python3.11 -m lead_hub.list_due_followups example-client
 ```

@@ -5,7 +5,7 @@ Validation and workflow tests for the follow-up assistant ops workspace.
 ## Running Tests
 
 ```bash
-python -m pytest tests/
+python3.11 -m pytest tests/
 ```
 
 ## Planned Test Coverage

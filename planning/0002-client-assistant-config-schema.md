@@ -104,7 +104,7 @@ Validation rules:
 - [x] Add a schema module, e.g. `lead_hub/schemas/client_config.py`.
 - [x] Add a loader/validator module for `clients/<slug>/config.yaml`.
 - [x] Add a command module so this works:
-      `python3 -m lead_hub.validate_client example-client`.
+      `python3.11 -m lead_hub.validate_client example-client`.
 - [x] Ensure the command exits non-zero and prints useful errors for invalid
       configs.
 - [x] Update `clients/example-client/config.yaml` only if required by the schema,
@@ -123,10 +123,10 @@ Validation rules:
 
 ## Verification
 
-- [x] `python3 -m pip install -e ".[dev]"` succeeds.
-- [x] `python3 -m lead_hub.validate_client example-client` succeeds.
-- [x] `python3 -m pytest tests/` succeeds (62 passed).
-- [x] `python3 -m compileall lead_hub openclaw tests` succeeds.
+- [x] `python3.11 -m pip install -e ".[dev]"` succeeds.
+- [x] `python3.11 -m lead_hub.validate_client example-client` succeeds.
+- [x] `python3.11 -m pytest tests/` succeeds (62 passed).
+- [x] `python3.11 -m compileall lead_hub openclaw tests` succeeds.
 - [x] `rg -n "config.example.yaml|state/<" README.md docs lead_hub clients planning`
       returns no stale source-of-truth references except historical execution
       notes that explicitly describe prior fixes.
@@ -159,3 +159,10 @@ and keeps the dependency list clean (no `email-validator` needed).
 expected invalid slug, but the plan defines slugs as "lowercase letters, numbers,
 and hyphens" — making `123` valid. Removed the incorrect test case rather than
 adding an artificial restriction not in the plan.
+
+**Python version in commands (post-review fix):** Initial documentation used `python3`
+throughout, but `/usr/bin/python3` on the shared dev machine is 3.9.6 and the package
+requires `>=3.11`. Per the updated CLAUDE.md verification-commands rule, all commands
+in README, `lead_hub/README.md`, `tests/README.md`, `docs/local-state.md`, and this
+plan's verification section are updated to `python3.11`. Verified each command passes
+using `python3.11` exactly as written before committing.

@@ -22,13 +22,13 @@ The schema is implemented with Pydantic v2.
 ### Validate a client config (plan 0002)
 
 ```bash
-python3 -m lead_hub.validate_client <client-slug>
+python3.11 -m lead_hub.validate_client <client-slug>
 ```
 
 Example:
 
 ```bash
-python3 -m lead_hub.validate_client example-client
+python3.11 -m lead_hub.validate_client example-client
 # OK: 'example-client' config is valid (Bright Spark Electrical, 5 service(s))
 ```
 
@@ -37,9 +37,9 @@ Exits 0 on success, 1 on validation error, 2 on missing argument.
 ### Planned commands (plans 0003 and 0004)
 
 ```bash
-python3 -m lead_hub.manual_lead example-client
-python3 -m lead_hub.list_due_followups example-client
-python3 -m lead_hub.weekly_report example-client
+python3.11 -m lead_hub.manual_lead example-client
+python3.11 -m lead_hub.list_due_followups example-client
+python3.11 -m lead_hub.weekly_report example-client
 ```
 
 ## Lead Status Flow

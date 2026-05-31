@@ -116,30 +116,34 @@ See [docs/OVERALL_PLAN.md](docs/OVERALL_PLAN.md) for the full phased plan.
 - Keep live state, logs, exports, and backups out of git.
 - Treat this repo as private operational infrastructure.
 
-## Future Commands
+## Commands
 
-Install dependencies (Python 3.11+):
+This repo requires Python 3.11+. The system `python3` on the shared dev machine
+is Python 3.9, so all commands use `python3.11` explicitly. On the Mac mini
+production host, verify with `python3.11 --version` before running any command.
+
+Install dependencies:
 
 ```bash
-python3 -m pip install -e ".[dev]"
+python3.11 -m pip install -e ".[dev]"
 ```
 
 Validate a client config:
 
 ```bash
-python3 -m lead_hub.validate_client example-client
+python3.11 -m lead_hub.validate_client example-client
 ```
 
 Run tests:
 
 ```bash
-python3 -m pytest tests/
+python3.11 -m pytest tests/
 ```
 
 Planned commands (not yet implemented):
 
 ```bash
-python3 -m lead_hub.manual_lead example-client
-python3 -m lead_hub.list_due_followups example-client
-python3 -m lead_hub.weekly_report example-client
+python3.11 -m lead_hub.manual_lead example-client
+python3.11 -m lead_hub.list_due_followups example-client
+python3.11 -m lead_hub.weekly_report example-client
 ```
