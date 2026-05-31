@@ -353,6 +353,29 @@ class TestConfigLoader:
         with pytest.raises(FileNotFoundError, match="no-such-client"):
             load_client_config("no-such-client")
 
+    def test_client_id_mismatch_raises_value_error(self, tmp_path):
+        """Config placed under a slug that doesn't match its internal client_id."""
+        import yaml as _yaml
+        from lead_hub.config_loader import load_client_config, _client_config_path
+
+        # Write a valid config whose client_id is 'example-client' but load it
+        # as 'wrong-slug' by temporarily monkey-patching the path resolver.
+        wrong_slug = "wrong-slug"
+        wrong_dir = tmp_path / "clients" / wrong_slug
+        wrong_dir.mkdir(parents=True)
+        config_data = copy.deepcopy(_VALID)  # client_id == 'example-client'
+        (wrong_dir / "config.yaml").write_text(_yaml.dump(config_data))
+
+        # Patch _REPO_ROOT inside config_loader so it uses tmp_path
+        import lead_hub.config_loader as loader_mod
+        original_root = loader_mod._REPO_ROOT
+        loader_mod._REPO_ROOT = tmp_path
+        try:
+            with pytest.raises(ValueError, match="identity mismatch"):
+                load_client_config(wrong_slug)
+        finally:
+            loader_mod._REPO_ROOT = original_root
+
 
 # ---------------------------------------------------------------------------
 # validate_client CLI

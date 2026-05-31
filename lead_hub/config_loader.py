@@ -31,12 +31,17 @@ def _client_config_path(client_slug: str) -> Path:
 def load_client_config(client_slug: str) -> ClientAssistantConfig:
     """Load and validate the config for *client_slug*.
 
+    The validated config's ``client_id`` must match *client_slug*. A mismatch
+    means the config file was placed in the wrong directory or its internal ID
+    was changed, either of which is a misconfiguration.
+
     Raises
     ------
     FileNotFoundError
         If ``clients/<client_slug>/config.yaml`` does not exist.
     ValueError
-        If the YAML cannot be parsed.
+        If the YAML cannot be parsed, is not a mapping, or the internal
+        ``client_id`` does not match *client_slug*.
     pydantic.ValidationError
         If the config does not satisfy the schema.
     """
@@ -58,4 +63,13 @@ def load_client_config(client_slug: str) -> ClientAssistantConfig:
             f"Config for {client_slug!r} must be a YAML mapping, got {type(data).__name__}"
         )
 
-    return ClientAssistantConfig.model_validate(data)
+    config = ClientAssistantConfig.model_validate(data)
+
+    if config.client_id != client_slug:
+        raise ValueError(
+            f"Config identity mismatch: loaded via slug {client_slug!r} but "
+            f"config.client_id is {config.client_id!r}. "
+            f"Move the config to clients/{config.client_id}/ or correct client_id."
+        )
+
+    return config

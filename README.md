@@ -92,10 +92,11 @@ The assistant must:
   placeholder, `.gitignore` coverage, local-state documentation.
 - Plan 0002 complete: Pydantic v2 client config schema, YAML loader,
   `validate_client` command, 62-test suite.
+- Plan 0003 complete: normalized lead model, JSONL storage, status transitions,
+  `manual_lead` / `list_leads` / `list_due_followups` commands, 42-test suite.
 
 Remaining backlog:
 
-3. Implement the lead hub storage model.
 4. Add website and manual lead intake.
 5. Openclaw prompts and agent instructions.
 6. Lead classification and draft reply workflow.
@@ -140,10 +141,27 @@ Run tests:
 python3.11 -m pytest tests/
 ```
 
+Create a manual test lead:
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.manual_lead example-client \
+  --name "Test Lead" --email "lead@example.invalid" --message "Please quote for an EICR"
+```
+
+List stored leads:
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.list_leads example-client
+```
+
+List due follow-ups:
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.list_due_followups example-client
+```
+
 Planned commands (not yet implemented):
 
 ```bash
-python3.11 -m lead_hub.manual_lead example-client
-python3.11 -m lead_hub.list_due_followups example-client
 python3.11 -m lead_hub.weekly_report example-client
 ```

@@ -119,53 +119,66 @@ in this plan.
 
 ## Tasks
 
-- [ ] Add `lead_hub/schemas/lead.py` with the normalized lead schema and status
+- [x] Add `lead_hub/schemas/lead.py` with the normalized lead schema and status
       enum.
-- [ ] Add storage helpers for resolving state root, client directory, and
+- [x] Add storage helpers for resolving state root, client directory, and
       `leads.jsonl`.
-- [ ] Add JSONL read/write helpers.
-- [ ] Add a helper to create a lead with generated `lead_id` and current
+- [x] Add JSONL read/write helpers.
+- [x] Add a helper to create a lead with generated `lead_id` and current
       timezone-aware `received_at`.
-- [ ] Add a helper to update lead status and optional follow-up timestamp.
-- [ ] Add a helper to list due follow-ups.
-- [ ] Add `manual_lead` command.
-- [ ] Add `list_leads` command.
-- [ ] Add `list_due_followups` command.
-- [ ] Ensure commands validate the client config before operating.
-- [ ] Ensure tests use `LOCAL_GROWTH_STATE_ROOT` or injectable temporary state
+- [x] Add a helper to update lead status and optional follow-up timestamp.
+- [x] Add a helper to list due follow-ups.
+- [x] Add `manual_lead` command.
+- [x] Add `list_leads` command.
+- [x] Add `list_due_followups` command.
+- [x] Ensure commands validate the client config before operating.
+- [x] Ensure tests use `LOCAL_GROWTH_STATE_ROOT` or injectable temporary state
       roots and never write to `/var/openclaw/`.
-- [ ] Add tests for valid lead creation and serialization.
-- [ ] Add tests for invalid lead validation.
-- [ ] Add tests for JSONL round-trip storage.
-- [ ] Add tests for status update.
-- [ ] Add tests for due follow-up filtering.
-- [ ] Update README docs with the new commands.
-- [ ] Update `lead_hub/README.md` with the lead model, storage location, state
+- [x] Add tests for valid lead creation and serialization.
+- [x] Add tests for invalid lead validation.
+- [x] Add tests for JSONL round-trip storage.
+- [x] Add tests for status update.
+- [x] Add tests for due follow-up filtering.
+- [x] Update README docs with the new commands.
+- [x] Update `lead_hub/README.md` with the lead model, storage location, state
       root override, and command examples.
-- [ ] Update `docs/local-state.md` if needed.
-- [ ] Update this plan's checkboxes and execution notes as work completes.
+- [x] Update `docs/local-state.md` if needed.
+- [x] Update this plan's checkboxes and execution notes as work completes.
 
 ## Verification
 
-- [ ] `python3.11 -m pip install -e ".[dev]"` succeeds.
-- [ ] `LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.manual_lead example-client --name "Test Lead" --email "lead@example.invalid" --message "Please quote for an EICR"` succeeds.
-- [ ] `LOCAL_GROWTH_STATE_ROOT="<same temp dir>" python3.11 -m lead_hub.list_leads example-client` shows the created lead.
-- [ ] `LOCAL_GROWTH_STATE_ROOT="<same temp dir>" python3.11 -m lead_hub.list_due_followups example-client` runs successfully.
-- [ ] `python3.11 -m pytest tests/` succeeds.
-- [ ] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
-- [ ] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning pyproject.toml`
+- [x] `python3.11 -m pip install -e ".[dev]"` succeeds.
+- [x] `LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.manual_lead example-client --name "Test Lead" --email "lead@example.invalid" --message "Please quote for an EICR"` succeeds.
+- [x] `LOCAL_GROWTH_STATE_ROOT="<same temp dir>" python3.11 -m lead_hub.list_leads example-client` shows the created lead.
+- [x] `LOCAL_GROWTH_STATE_ROOT="<same temp dir>" python3.11 -m lead_hub.list_due_followups example-client` runs successfully.
+- [x] `python3.11 -m pytest tests/` succeeds (104 passed: 62 config + 42 storage).
+- [x] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
+- [x] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning pyproject.toml`
       returns no live stale command/path references except historical execution
       notes.
-- [ ] `git status --short` shows only intentional changes before commit.
+- [x] `git status --short` shows only intentional changes before commit.
 
 ## Branch And PR
 
-- [ ] Create a branch named `codex/ops-lead-hub-storage`.
-- [ ] Commit with a clear message.
-- [ ] Open a draft pull request linked to issue #3.
-- [ ] PR description includes model decisions, files changed, deferred work, and
+- [x] Create a branch named `codex/ops-lead-hub-storage`.
+- [x] Commit with a clear message.
+- [x] Open a draft pull request linked to issue #3.
+- [x] PR description includes model decisions, files changed, deferred work, and
       verification commands run.
 
 ## Execution Notes
 
-Add notes here if implementation requires a meaningful deviation from the plan.
+**`consent.privacy_accepted` for manual leads:** The plan notes this rule may be
+too early for MVP implementation. Manual test leads set `privacy_accepted=False`
+and this is explicitly accepted — the model does not enforce `True` at the schema
+level. The docstring and a dedicated test document this. Production intake
+(plan 0004) will enforce `True` for website-originated leads.
+
+**`list_leads` command:** The plan specified `list_leads` as a command name but
+listed it under section "Commands" only. Implemented as
+`python3.11 -m lead_hub.list_leads` alongside `manual_lead` and
+`list_due_followups`.
+
+**`docs/local-state.md` unchanged:** No updates were needed — the file already
+correctly documents the `/var/openclaw/` root and the `LOCAL_GROWTH_STATE_ROOT`
+override is documented in `lead_hub/README.md` and `lead_hub/storage.py`.

@@ -14,31 +14,50 @@ This package owns:
 
 ## Schema
 
-Client assistant configs are validated by `lead_hub.schemas.client_config`.
-The schema is implemented with Pydantic v2.
+- Client assistant configs: `lead_hub.schemas.client_config` (Pydantic v2)
+- Normalized lead model: `lead_hub.schemas.lead` (Pydantic v2)
+
+## State Root
+
+Production:  `/var/openclaw/clients/<client-slug>/leads.jsonl`
+Development: set `LOCAL_GROWTH_STATE_ROOT=<path>` to override.
+
+State files are never committed to git. See `docs/local-state.md`.
 
 ## Commands
 
-### Validate a client config (plan 0002)
+### Validate a client config
 
 ```bash
 python3.11 -m lead_hub.validate_client <client-slug>
-```
-
-Example:
-
-```bash
-python3.11 -m lead_hub.validate_client example-client
 # OK: 'example-client' config is valid (Bright Spark Electrical, 5 service(s))
 ```
 
-Exits 0 on success, 1 on validation error, 2 on missing argument.
-
-### Planned commands (plans 0003 and 0004)
+### Create a manual test lead
 
 ```bash
-python3.11 -m lead_hub.manual_lead example-client
-python3.11 -m lead_hub.list_due_followups example-client
+python3.11 -m lead_hub.manual_lead <client-slug> \
+  --name "Test Lead" --email "lead@example.invalid" \
+  --message "Please quote for an EICR" [--phone TEXT] [--service TEXT] [--urgency normal]
+```
+
+### List stored leads
+
+```bash
+python3.11 -m lead_hub.list_leads <client-slug>
+```
+
+### List due follow-ups
+
+```bash
+python3.11 -m lead_hub.list_due_followups <client-slug>
+```
+
+All commands: exit 0 on success, 1 on error, 2 on missing argument.
+
+### Planned commands (plan 0008 onward)
+
+```bash
 python3.11 -m lead_hub.weekly_report example-client
 ```
 
