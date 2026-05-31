@@ -29,34 +29,45 @@ Defer:
 
 ## Tasks
 
-- [ ] Create `clients/example-client/` with fictional placeholder content only.
-- [ ] Create `lead_hub/` for future deterministic ingestion and state scripts.
-- [ ] Create `openclaw/agents/followup-assistant/` for future agent instructions
+- [x] Create `clients/example-client/` with fictional placeholder content only.
+- [x] Create `lead_hub/` for future deterministic ingestion and state scripts.
+- [x] Create `openclaw/agents/followup-assistant/` for future agent instructions
       and prompts.
-- [ ] Create `runbooks/` for operator setup and production procedures.
-- [ ] Create `tests/` for future validation and workflow tests.
-- [ ] Create a local-state placeholder directory or documentation explaining
+- [x] Create `runbooks/` for operator setup and production procedures.
+- [x] Create `tests/` for future validation and workflow tests.
+- [x] Create a local-state placeholder directory or documentation explaining
       where state/logs should live outside git.
-- [ ] Update `.gitignore` to exclude state, logs, secrets, exports, backups,
+- [x] Update `.gitignore` to exclude state, logs, secrets, exports, backups,
       local environment files, and live lead data.
-- [ ] Update `README.md` if actual structure differs from the current
+- [x] Update `README.md` if actual structure differs from the current
       documentation.
-- [ ] Keep all example data fictional and commit no secrets.
+- [x] Keep all example data fictional and commit no secrets.
 
 ## Verification
 
-- [ ] Confirm no real client data, secrets, lead logs, or tokens are present.
-- [ ] `git status --short` shows only intentional changes before commit.
-- [ ] Any lightweight tests or checks introduced by this plan pass.
+- [x] Confirm no real client data, secrets, lead logs, or tokens are present.
+- [x] `git status --short` shows only intentional changes before commit.
+- [x] Any lightweight tests or checks introduced by this plan pass.
 
 ## Branch And PR
 
-- [ ] Create a branch named `codex/ops-scaffold`.
-- [ ] Commit with a clear message.
-- [ ] Open a draft pull request linked to issue #1.
-- [ ] PR description includes what was scaffolded, what was deferred, and any
+- [x] Create a branch named `codex/ops-scaffold`.
+- [x] Commit with a clear message.
+- [x] Open a draft pull request linked to issue #1.
+- [x] PR description includes what was scaffolded, what was deferred, and any
       verification performed.
 
 ## Execution Notes
 
-Add notes here if implementation requires a meaningful deviation from the plan.
+**Post-review fixes (same PR, follow-up commit):**
+
+1. Config filename: initial commit created `config.example.yaml` and documented it
+   under that name in the top-level README, while `clients/example-client/README.md`
+   and `docs/local-state.md` expected `config.yaml`. Renamed to `config.yaml` (the
+   directory name already signals it is fictional) and updated the top-level README.
+
+2. Runtime state path: `lead_hub/README.md` referenced a relative `state/` path
+   that looked like it might live inside the repo. Updated to the canonical
+   `/var/openclaw/clients/<client-slug>/leads.jsonl` path. Also tightened
+   `docs/local-state.md` to name `/var/openclaw/` as the single authoritative
+   runtime root (with `~/openclaw-state/` noted only as a dev-machine fallback).

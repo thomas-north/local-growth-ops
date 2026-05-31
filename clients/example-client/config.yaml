@@ -1,0 +1,91 @@
+# Example Client — Assistant Config
+#
+# This is a FICTIONAL example only. Replace every field when onboarding a
+# real client. Never commit real client data, API tokens, or secrets.
+#
+# Schema will be formalised in plan 0002. This placeholder establishes the
+# directory structure and documents expected fields.
+
+client_id: example-client
+client_slug: example-client
+
+# Business identity
+business:
+  name: "Bright Spark Electrical"
+  legal_name: "Bright Spark Electrical Ltd"
+  tagline: "Reliable domestic electricians in South Leeds"
+  description: >
+    Bright Spark Electrical is a small family-run domestic electrical
+    contractor based in South Leeds. We cover installations, rewires,
+    fault-finding, and landlord certificates.
+  phone: "0113 000 0000"
+  email: "hello@example-client.invalid"
+  address_visible: false  # do not show full address on website
+  area: "South Leeds and surrounding postcodes"
+
+# Services the assistant can discuss
+services:
+  - name: "Full rewire"
+    slug: "full-rewire"
+  - name: "Consumer unit replacement"
+    slug: "consumer-unit"
+  - name: "Fault finding and repair"
+    slug: "fault-finding"
+  - name: "Landlord electrical certificate (EICR)"
+    slug: "eicr"
+  - name: "EV charger installation"
+    slug: "ev-charger"
+
+# What the assistant must never do
+exclusions:
+  - Never quote fixed prices without owner approval
+  - Never commit to availability or timescales
+  - Never handle complaints autonomously
+  - Never discuss non-domestic or commercial work
+
+# Pricing policy
+pricing_policy: >
+  Do not quote specific prices. Say that pricing depends on the job scope and
+  that the owner will provide a quote after a site visit or phone call.
+
+# Opening hours (for response tone only — do not promise availability)
+hours:
+  monday_friday: "08:00–18:00"
+  saturday: "09:00–13:00"
+  sunday: "Closed"
+
+# Tone guidelines
+tone:
+  style: "Friendly, plain-English, no jargon"
+  length: "Keep replies concise — two to three short paragraphs maximum"
+  sign_off: "Tom, Bright Spark Electrical"
+
+# Operator approval contacts
+approval:
+  telegram_chat_id: ""  # set in secrets, not here
+  email: ""             # set in secrets, not here
+
+# Escalation triggers
+escalation_triggers:
+  - complaint or dispute
+  - safety concern or urgent hazard
+  - request for written guarantee or contract
+  - legal or insurance query
+  - abusive or distressing message
+
+# Follow-up cadence
+followup:
+  first_followup_days: 3
+  second_followup_days: 7
+  max_followups: 2
+
+# Auto-send permissions (MVP: never send without human approval)
+auto_send:
+  first_reply: false
+  followups: false
+  weekly_report: false
+
+# Retention
+retention:
+  lead_retention_days: 365
+  delete_pii_after_days: 730

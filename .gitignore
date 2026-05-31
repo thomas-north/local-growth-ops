@@ -216,3 +216,60 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# =============================================================================
+# Openclaw operational data — NEVER commit anything in these categories
+# =============================================================================
+
+# Live lead data (JSONL per client)
+leads.jsonl
+leads.jsonl.bak
+*.leads.jsonl
+
+# Per-client runtime state
+state.json
+state.json.bak
+
+# Operational logs
+logs/
+*.log
+*.log.*
+
+# Exports and generated reports
+exports/
+*.csv
+*.xlsx
+
+# Backups
+backups/
+*.tar.gz
+*.zip
+
+# Secrets and credentials
+secrets/
+*.env
+*.env.*
+!*.env.example
+.envrc
+telegram.env
+clients.env
+*_token.txt
+*_secret.txt
+*.pem
+*.key
+
+# Local state directories (live outside git — see docs/local-state.md)
+state/
+local-state/
+
+# Per-client live data directories
+clients/*/leads/
+clients/*/state/
+clients/*/logs/
+
+# Any file containing the word "secret" or "token" in the name
+*secret*
+*token*
+# (exceptions for documentation)
+!*secret*.md
+!*token*.md

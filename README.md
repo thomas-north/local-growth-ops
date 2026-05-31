@@ -40,18 +40,31 @@ Default model:
 - the operator approves or escalates
 - the client receives simple summaries and requests for approval
 
-## Intended Architecture
+## Repository Structure
 
-This repo will evolve into a private operations workspace:
+```
+clients/
+  example-client/           fictional placeholder client (config only — no real data)
+    config.yaml             fictional assistant config (template for real clients)
+lead_hub/                   deterministic lead ingestion and state scripts
+  schemas/                  data models and validation (plan 0002 onward)
+openclaw/
+  agents/
+    followup-assistant/     Openclaw agent instructions and prompts (plan 0005 onward)
+runbooks/                   operator setup and Mac mini production procedures
+tests/                      validation and workflow tests
+docs/
+  OVERALL_PLAN.md           phased implementation plan
+  local-state.md            where live operational data lives outside git
+planning/                   executable implementation plans (Codex writes, Claude Code executes)
+```
 
-- `clients/example-client/` contains fictional client assistant config.
-- `lead_hub/` contains deterministic ingestion and state scripts.
-- `openclaw/agents/followup-assistant/` contains agent instructions and prompts.
-- `runbooks/` contains setup, healthcheck, and operating procedures.
-- `tests/` contains validation and workflow tests.
+Live lead state, logs, exports, and backups live **outside this repo** on the
+Mac mini. See [docs/local-state.md](docs/local-state.md) for the directory
+layout.
 
-MVP storage should be simple local files, probably JSONL per client. SQLite can
-be introduced later if multi-client reporting becomes awkward.
+MVP storage is JSONL per client. SQLite can be introduced later if multi-client
+reporting becomes awkward.
 
 ## Core Assistant Rules
 
@@ -75,16 +88,23 @@ The assistant must:
 
 ## Development Status
 
-This repository is at planning/bootstrap stage.
+Bootstrap scaffold complete (plan 0001). Directory structure, example client
+placeholder, `.gitignore` coverage, and local-state documentation are in place.
 
-The initial implementation backlog is tracked in GitHub issues. Start with:
+Remaining backlog:
 
-1. Scaffold the follow-up assistant ops workspace.
 2. Define the client assistant config schema.
 3. Implement the lead hub storage model.
 4. Add website and manual lead intake.
+5. Openclaw prompts and agent instructions.
+6. Lead classification and draft reply workflow.
+7. Telegram operator approval workflow.
+8. Follow-up scheduler and weekly client report.
+9. Mac mini production runbook.
+10. Privacy, retention, and safety policy.
+11. External-agent implementation brief.
 
-See [docs/OVERALL_PLAN.md](docs/OVERALL_PLAN.md) for the implementation plan.
+See [docs/OVERALL_PLAN.md](docs/OVERALL_PLAN.md) for the full phased plan.
 
 ## Safety Rules
 
