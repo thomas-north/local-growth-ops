@@ -94,10 +94,12 @@ The assistant must:
   `validate_client` command, 62-test suite.
 - Plan 0003 complete: normalized lead model, JSONL storage, status transitions,
   `manual_lead` / `list_leads` / `list_due_followups` commands, 42-test suite.
+- Plan 0004 complete: website payload schema, manual adapter, `ingest_website_payload`
+  command, refactored `manual_lead`, website contract docs, 36-test suite.
 
 Remaining backlog:
 
-4. Add website and manual lead intake.
+5. Openclaw prompts and agent instructions.
 5. Openclaw prompts and agent instructions.
 6. Lead classification and draft reply workflow.
 7. Telegram operator approval workflow.
@@ -159,6 +161,16 @@ List due follow-ups:
 ```bash
 LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.list_due_followups example-client
 ```
+
+Ingest a website form payload:
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.ingest_website_payload \
+  example-client /path/to/payload.json
+```
+
+See [docs/website-payload-contract.md](docs/website-payload-contract.md) for
+the full payload schema.
 
 Planned commands (not yet implemented):
 

@@ -16,6 +16,11 @@ This package owns:
 
 - Client assistant configs: `lead_hub.schemas.client_config` (Pydantic v2)
 - Normalized lead model: `lead_hub.schemas.lead` (Pydantic v2)
+- Intake payloads: `lead_hub.schemas.intake` — `WebsiteLeadPayload` and
+  `ManualLeadPayload` with converters to `NormalizedLead`
+
+See [docs/website-payload-contract.md](../docs/website-payload-contract.md)
+for the full website payload schema shared with `local-growth-sites`.
 
 ## State Root
 
@@ -52,6 +57,16 @@ python3.11 -m lead_hub.list_leads <client-slug>
 ```bash
 python3.11 -m lead_hub.list_due_followups <client-slug>
 ```
+
+### Ingest a website form payload
+
+```bash
+python3.11 -m lead_hub.ingest_website_payload <client-slug> <payload.json>
+```
+
+Validates the client config, validates the JSON payload against
+`WebsiteLeadPayload`, enforces `privacy_accepted=true` and client ID match,
+then appends a `NormalizedLead` to the JSONL store.
 
 All commands: exit 0 on success, 1 on error, 2 on missing argument.
 
