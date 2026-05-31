@@ -50,6 +50,8 @@ Before marking verification complete:
   the setup or use the versioned executable instead
 - do not claim a command passed if it only passes in a different local
   environment than the documented command
+- apply this rule to READMEs, planning files, PR descriptions, code docstrings,
+  CLI help/usage output, comments, and tests
 
 ## Repository Boundary
 
