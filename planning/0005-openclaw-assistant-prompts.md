@@ -307,6 +307,12 @@ the tests is to confirm the concepts are present, not a specific capitalisation.
 Fixed by lower-casing both sides of the comparison (`content.lower()`). No
 content change needed in the prompt files.
 
+**Post-review README backlog fix:** The plan-0005 commit introduced a backlog
+regression: item 5 ("Openclaw prompts and agent instructions") was not removed
+from the remaining backlog, and item 6 appeared twice. Fixed in a follow-up
+commit: removed the completed item 5 and the duplicate item 6, leaving a clean
+ordered list starting at 6.
+
 **Real-client grep false positives:** The verification grep for real-client data
 returns two matches, both from warning statements in documentation:
 - `openclaw/agents/followup-assistant/README.md`: "No real client data, phone

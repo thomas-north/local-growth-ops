@@ -102,8 +102,6 @@ The assistant must:
 Remaining backlog:
 
 6. Lead classification and draft reply workflow.
-5. Openclaw prompts and agent instructions.
-6. Lead classification and draft reply workflow.
 7. Telegram operator approval workflow.
 8. Follow-up scheduler and weekly client report.
 9. Mac mini production runbook.
