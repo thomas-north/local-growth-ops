@@ -27,13 +27,8 @@ import argparse
 import sys
 
 from lead_hub.config_loader import load_client_config
-from lead_hub.schemas.lead import (
-    ConsentInfo,
-    ContactInfo,
-    ContactMethod,
-    Urgency,
-    new_lead,
-)
+from lead_hub.schemas.intake import ManualLeadPayload, manual_payload_to_lead
+from lead_hub.schemas.lead import ContactMethod, Urgency
 from lead_hub.storage import append_lead
 
 
@@ -82,26 +77,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
 
-    contact = ContactInfo(
+    # Infer preferred_contact_method from the flags provided, preserving the
+    # pre-refactor behaviour: email wins if both are given, otherwise phone.
+    preferred = ContactMethod.email if args.email else ContactMethod.phone
+
+    payload = ManualLeadPayload(
+        client_id=config.client_id,
+        name=args.name,
         email=args.email or None,
         phone=args.phone or None,
-        preferred_method=ContactMethod.email if args.email else ContactMethod.phone,
+        preferred_contact_method=preferred,
+        service_requested=args.service,
+        message=args.message,
+        urgency=Urgency(args.urgency),
     )
 
-    lead = new_lead(
-        client_id=config.client_id,
-        source="manual",
-        name=args.name,
-        contact=contact,
-        message=args.message,
-        service_requested=args.service,
-        urgency=Urgency(args.urgency),
-        consent=ConsentInfo(
-            # Manual test leads: privacy_accepted=False is documented and acceptable.
-            privacy_accepted=False,
-            marketing_opt_in=False,
-        ),
-    )
+    lead = manual_payload_to_lead(payload)
 
     try:
         append_lead(args.client_slug, lead)

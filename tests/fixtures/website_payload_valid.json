@@ -1,0 +1,15 @@
+{
+  "client_id": "example-client",
+  "site_id": "example-client-main",
+  "source_page": "/contact",
+  "submitted_at": "2026-06-01T10:30:00+00:00",
+  "name": "Jane Smith",
+  "preferred_contact_method": "email",
+  "email": "jane@example.invalid",
+  "phone": null,
+  "service_requested": "eicr",
+  "urgency": "normal",
+  "message": "I need a landlord electrical certificate for my property in South Leeds. When are you available?",
+  "privacy_accepted": true,
+  "marketing_opt_in": false
+}

@@ -104,51 +104,71 @@ Update or refactor:
 
 ## Tasks
 
-- [ ] Add `lead_hub/schemas/intake.py` or equivalent payload schema module.
-- [ ] Add website payload model.
-- [ ] Add manual payload model or shared manual adapter input model.
-- [ ] Add conversion function from website payload to `NormalizedLead`.
-- [ ] Add conversion function from manual payload to `NormalizedLead`.
-- [ ] Add `ingest_website_payload` command.
-- [ ] Refactor `manual_lead` to use the manual adapter.
-- [ ] Add fictional website payload fixture in tests.
-- [ ] Add tests for valid website payload ingestion.
-- [ ] Add tests rejecting website payloads with `privacy_accepted=false`.
-- [ ] Add tests rejecting client ID mismatch between command client and payload.
-- [ ] Add tests rejecting payloads with no contact method.
-- [ ] Add tests confirming manual lead command remains compatible.
-- [ ] Update README with the new ingestion command.
-- [ ] Update `lead_hub/README.md` with the website payload contract.
-- [ ] Add or update docs explaining the contract that `local-growth-sites` must
+- [x] Add `lead_hub/schemas/intake.py` or equivalent payload schema module.
+- [x] Add website payload model.
+- [x] Add manual payload model or shared manual adapter input model.
+- [x] Add conversion function from website payload to `NormalizedLead`.
+- [x] Add conversion function from manual payload to `NormalizedLead`.
+- [x] Add `ingest_website_payload` command.
+- [x] Refactor `manual_lead` to use the manual adapter.
+- [x] Add fictional website payload fixture in tests.
+- [x] Add tests for valid website payload ingestion.
+- [x] Add tests rejecting website payloads with `privacy_accepted=false`.
+- [x] Add tests rejecting client ID mismatch between command client and payload.
+- [x] Add tests rejecting payloads with no contact method.
+- [x] Add tests confirming manual lead command remains compatible.
+- [x] Update README with the new ingestion command.
+- [x] Update `lead_hub/README.md` with the website payload contract.
+- [x] Add or update docs explaining the contract that `local-growth-sites` must
       later emit from its contact form.
-- [ ] Update this plan's checkboxes and execution notes as work completes.
+- [x] Update this plan's checkboxes and execution notes as work completes.
 
 ## Verification
 
-- [ ] `python3.11 -m pip install -e ".[dev]"` succeeds.
-- [ ] Create a temp website payload JSON file and ingest it with
+- [x] `python3.11 -m pip install -e ".[dev]"` succeeds.
+- [x] Create a temp website payload JSON file and ingest it with
       `LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.ingest_website_payload example-client <payload.json>`.
-- [ ] With the same state root, `python3.11 -m lead_hub.list_leads example-client`
+- [x] With the same state root, `python3.11 -m lead_hub.list_leads example-client`
       shows the website lead.
-- [ ] A website payload with `privacy_accepted=false` exits non-zero.
-- [ ] A website payload whose `client_id` does not match the command client exits
+- [x] A website payload with `privacy_accepted=false` exits non-zero.
+- [x] A website payload whose `client_id` does not match the command client exits
       non-zero.
-- [ ] `LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.manual_lead example-client --name "Manual Lead" --email "manual@example.invalid" --message "Manual test"` still succeeds.
-- [ ] `python3.11 -m pytest tests/` succeeds.
-- [ ] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
-- [ ] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning pyproject.toml`
+- [x] `LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.manual_lead example-client --name "Manual Lead" --email "manual@example.invalid" --message "Manual test"` still succeeds.
+- [x] `python3.11 -m pytest tests/` succeeds (141 passed: 63 config + 42 storage + 36 intake).
+- [x] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
+- [x] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning pyproject.toml`
       returns no live stale command/path references except historical execution
       notes.
-- [ ] `git status --short` shows only intentional changes before commit.
+- [x] `git status --short` shows only intentional changes before commit.
 
 ## Branch And PR
 
-- [ ] Create a branch named `codex/ops-intake-adapters`.
-- [ ] Commit with a clear message.
-- [ ] Open a draft pull request linked to issue #4.
-- [ ] PR description includes payload contract decisions, files changed,
+- [x] Create a branch named `codex/ops-intake-adapters`.
+- [x] Commit with a clear message.
+- [x] Open a draft pull request linked to issue #4.
+- [x] PR description includes payload contract decisions, files changed,
       deferred work, and verification commands run.
 
 ## Execution Notes
 
-Add notes here if implementation requires a meaningful deviation from the plan.
+**`ManualLeadPayload.preferred_contact_method` defaulting:** The plan did not
+specify a default for `preferred_contact_method` on the manual payload. Set it
+to `ContactMethod.unknown`, matching the website payload default, so
+`manual_payload_to_lead` always produces a valid `ContactInfo.preferred_method`.
+
+**`manual_lead` refactored, contract preserved:** The CLI flags and output
+format are unchanged. Internally, the command now builds a `ManualLeadPayload`
+and calls `manual_payload_to_lead` instead of constructing `NormalizedLead`
+fields directly. All existing `TestManualLeadCLI` tests in
+`test_lead_storage.py` continue to pass.
+
+**Post-review bug fix — `preferred_contact_method` regression (PR #15):**
+The initial refactor passed only the contact values to `ManualLeadPayload`
+without also passing `preferred_contact_method`, so all manual leads created
+via the CLI stored `contact.preferred_method = unknown` regardless of which
+flag was used. The pre-refactor CLI set this explicitly as
+`ContactMethod.email if args.email else ContactMethod.phone`.
+Fixed by computing `preferred` from the CLI args and passing it to the
+payload before calling `manual_payload_to_lead`. Three regression tests added
+to `TestManualLeadCLIBackwardCompat`: email-only → `email`, phone-only →
+`phone`, both → `email` (tiebreak preserved from original code).
