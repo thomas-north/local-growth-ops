@@ -323,3 +323,40 @@ class TestManualLeadCLIBackwardCompat:
         assert rc == 0
         leads = read_leads("example-client")
         assert leads[0].urgency == Urgency.high
+
+    # --- Regression: preferred_contact_method must be inferred from flags ---
+    # Before the plan-0004 refactor this was set explicitly in the CLI.
+    # The refactor accidentally dropped it, leaving every manual lead as
+    # preferred_method=unknown. These tests pin the correct behaviour.
+
+    def test_email_only_sets_preferred_email(self, tmp_state):
+        from lead_hub.manual_lead import main
+        main([
+            "example-client",
+            "--email", "e@example.invalid",
+            "--message", "Email-only lead",
+        ])
+        leads = read_leads("example-client")
+        assert leads[0].contact.preferred_method == ContactMethod.email
+
+    def test_phone_only_sets_preferred_phone(self, tmp_state):
+        from lead_hub.manual_lead import main
+        main([
+            "example-client",
+            "--phone", "07700000099",
+            "--message", "Phone-only lead",
+        ])
+        leads = read_leads("example-client")
+        assert leads[0].contact.preferred_method == ContactMethod.phone
+
+    def test_both_contact_methods_prefers_email(self, tmp_state):
+        """When both --email and --phone are given, email takes precedence."""
+        from lead_hub.manual_lead import main
+        main([
+            "example-client",
+            "--email", "both@example.invalid",
+            "--phone", "07700000098",
+            "--message", "Both-contact lead",
+        ])
+        leads = read_leads("example-client")
+        assert leads[0].contact.preferred_method == ContactMethod.email

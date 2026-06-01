@@ -161,3 +161,14 @@ format are unchanged. Internally, the command now builds a `ManualLeadPayload`
 and calls `manual_payload_to_lead` instead of constructing `NormalizedLead`
 fields directly. All existing `TestManualLeadCLI` tests in
 `test_lead_storage.py` continue to pass.
+
+**Post-review bug fix — `preferred_contact_method` regression (PR #15):**
+The initial refactor passed only the contact values to `ManualLeadPayload`
+without also passing `preferred_contact_method`, so all manual leads created
+via the CLI stored `contact.preferred_method = unknown` regardless of which
+flag was used. The pre-refactor CLI set this explicitly as
+`ContactMethod.email if args.email else ContactMethod.phone`.
+Fixed by computing `preferred` from the CLI args and passing it to the
+payload before calling `manual_payload_to_lead`. Three regression tests added
+to `TestManualLeadCLIBackwardCompat`: email-only → `email`, phone-only →
+`phone`, both → `email` (tiebreak preserved from original code).
