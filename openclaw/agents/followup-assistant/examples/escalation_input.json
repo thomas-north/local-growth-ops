@@ -1,0 +1,32 @@
+{
+  "client_config": {
+    "client_id": "example-client",
+    "business": {
+      "name": "Bright Spark Electrical"
+    },
+    "services": [
+      { "name": "Full rewire", "slug": "full-rewire" },
+      { "name": "Fault finding and repair", "slug": "fault-finding" }
+    ],
+    "exclusions": [
+      "Never handle complaints autonomously",
+      "Never discuss non-domestic or commercial work"
+    ],
+    "escalation_triggers": [
+      "complaint or dispute",
+      "safety concern or urgent hazard",
+      "request for written guarantee or contract",
+      "legal or insurance query",
+      "abusive or distressing message"
+    ]
+  },
+  "lead": {
+    "lead_id": "b2c3d4e5-0000-0000-0000-000000000002",
+    "name": "David Jones",
+    "message": "Your electrician came last month and now my sockets aren't working. I've had to call another sparky to fix it and I want you to pay for it. I'll be taking this further if you don't respond.",
+    "service_requested": "fault-finding",
+    "urgency": "high",
+    "status": "new",
+    "conversation_summary": ""
+  }
+}

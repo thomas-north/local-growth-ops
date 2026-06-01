@@ -1,0 +1,29 @@
+{
+  "client_config": {
+    "client_id": "example-client",
+    "business": {
+      "name": "Bright Spark Electrical"
+    },
+    "tone": {
+      "style": "Friendly, plain-English, no jargon",
+      "length": "Keep replies concise — two to three short paragraphs maximum",
+      "sign_off": "Tom, Bright Spark Electrical"
+    },
+    "followup": {
+      "first_followup_days": 3,
+      "second_followup_days": 7,
+      "max_followups": 2
+    }
+  },
+  "lead": {
+    "lead_id": "a1b2c3d4-0000-0000-0000-000000000001",
+    "name": "Jane Smith",
+    "message": "Hi, I need a landlord electrical certificate for my rental property in Beeston.",
+    "service_requested": "eicr",
+    "status": "followup_scheduled",
+    "next_followup_at": "2026-06-04T09:00:00+00:00",
+    "conversation_summary": "Lead enquired about EICR. First reply sent 2026-06-01 asking for property details and best time to call. No response received."
+  },
+  "followup_number": 1,
+  "previous_reply_summary": "Introduced the business, confirmed we do EICRs, asked for property details and a convenient call time."
+}

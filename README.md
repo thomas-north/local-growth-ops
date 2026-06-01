@@ -96,10 +96,12 @@ The assistant must:
   `manual_lead` / `list_leads` / `list_due_followups` commands, 42-test suite.
 - Plan 0004 complete: website payload schema, manual adapter, `ingest_website_payload`
   command, refactored `manual_lead`, website contract docs, 36-test suite.
+- Plan 0005 complete: Openclaw prompt library (instructions, 5 prompts, 10 JSON
+  examples), 75-test validation suite.
 
 Remaining backlog:
 
-5. Openclaw prompts and agent instructions.
+6. Lead classification and draft reply workflow.
 5. Openclaw prompts and agent instructions.
 6. Lead classification and draft reply workflow.
 7. Telegram operator approval workflow.

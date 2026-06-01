@@ -1,0 +1,14 @@
+{
+  "draft_subject": "Re: Landlord Electrical Certificate (EICR) — Bright Spark Electrical",
+  "draft_body": "Hi Jane,\n\nThank you for getting in touch. We'd be happy to carry out an EICR for your rental property in Beeston — it's exactly the kind of job we do regularly.\n\nPricing depends on the size of the property and the number of circuits, so we'd need to have a quick chat or arrange a visit to give you an accurate quote. Could you let me know a convenient time to call, or feel free to ring us on 0113 000 0000?\n\nTom, Bright Spark Electrical",
+  "assumptions": [
+    "Property is domestic (residential), not commercial",
+    "Property is within or close to South Leeds"
+  ],
+  "questions_for_lead": [
+    "How many bedrooms / circuits does the property have?",
+    "Is there a current EICR report, or is this the first one?"
+  ],
+  "operator_notes": "Standard EICR enquiry. No pricing quoted. Review tone and confirm phone number is current before sending.",
+  "approval_required": true
+}

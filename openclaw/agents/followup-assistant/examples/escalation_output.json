@@ -1,0 +1,11 @@
+{
+  "escalation_required": true,
+  "severity": "high",
+  "reasons": [
+    "Complaint or dispute about past work",
+    "Compensation or cost-recovery request",
+    "Implicit legal threat ('taking this further')"
+  ],
+  "operator_summary": "Lead is making a complaint about work carried out last month and demanding compensation for a remedial job done by a third party. The message contains an implicit legal threat. This must not receive an automated draft reply.",
+  "suggested_operator_action": "Review the job history for David Jones. If the complaint relates to a real job, escalate to the business owner before any response. Do not draft or send any reply through the assistant."
+}
