@@ -254,47 +254,71 @@ Telegram, or any external service.
 
 ## Tasks
 
-- [ ] Review current `openclaw/agents/followup-assistant/README.md`.
-- [ ] Create or update `instructions.md` with standing assistant rules.
-- [ ] Create `prompts/classify.md`.
-- [ ] Create `prompts/draft_reply.md`.
-- [ ] Create `prompts/draft_followup.md`.
-- [ ] Create `prompts/escalation.md`.
-- [ ] Create `prompts/weekly_report.md`.
-- [ ] Create valid JSON input/output examples for classification.
-- [ ] Create valid JSON input/output examples for first reply drafting.
-- [ ] Create valid JSON input/output examples for follow-up drafting.
-- [ ] Create valid JSON input/output examples for escalation detection.
-- [ ] Create valid JSON input/output examples for weekly reporting.
-- [ ] Add deterministic tests for file existence, JSON validity, output keys,
+- [x] Review current `openclaw/agents/followup-assistant/README.md`.
+- [x] Create or update `instructions.md` with standing assistant rules.
+- [x] Create `prompts/classify.md`.
+- [x] Create `prompts/draft_reply.md`.
+- [x] Create `prompts/draft_followup.md`.
+- [x] Create `prompts/escalation.md`.
+- [x] Create `prompts/weekly_report.md`.
+- [x] Create valid JSON input/output examples for classification.
+- [x] Create valid JSON input/output examples for first reply drafting.
+- [x] Create valid JSON input/output examples for follow-up drafting.
+- [x] Create valid JSON input/output examples for escalation detection.
+- [x] Create valid JSON input/output examples for weekly reporting.
+- [x] Add deterministic tests for file existence, JSON validity, output keys,
       and safety language.
-- [ ] Update README/docs to describe the prompt library.
-- [ ] Update this plan's checkboxes and execution notes.
+- [x] Update README/docs to describe the prompt library.
+- [x] Update this plan's checkboxes and execution notes.
 
 ## Verification
 
-- [ ] `python3.11 --version` satisfies `pyproject.toml`.
-- [ ] `python3.11 -m pip install -e ".[dev]"` succeeds.
-- [ ] `python3.11 -m pytest tests/` succeeds.
-- [ ] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
-- [ ] `find openclaw/agents/followup-assistant -maxdepth 3 -type f | sort`
-      shows the expected prompt and example files.
-- [ ] `python3.11 -m json.tool` succeeds for every `examples/*.json` file.
-- [ ] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning openclaw pyproject.toml`
-      returns no unapproved stale command/path references.
-- [ ] `rg -n "real client|actual client|@gmail|@hotmail|07[0-9]{9}|\\+44" openclaw/agents/followup-assistant`
-      returns no real-client-looking example data, unless an execution note
-      explains a false positive.
-- [ ] `git status --short` shows only intentional changes before commit.
+- [x] `python3.11 --version` satisfies `pyproject.toml` (3.11.15).
+- [x] `python3.11 -m pip install -e ".[dev]"` succeeds.
+- [x] `python3.11 -m pytest tests/` succeeds (219 passed: 63 config + 42 storage + 39 intake + 75 prompt library).
+- [x] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
+- [x] `find openclaw/agents/followup-assistant -maxdepth 3 -type f | sort`
+      shows the expected prompt and example files (17 files).
+- [x] `python3.11 -m json.tool` succeeds for every `examples/*.json` file (10/10 OK).
+- [x] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning openclaw pyproject.toml`
+      returns no unapproved stale command/path references (all matches are
+      historical execution notes or the plan's own verification text).
+- [x] `rg -n "real client|actual client|@gmail|@hotmail|07[0-9]{9}|\\+44" openclaw/agents/followup-assistant`
+      returns no real-client-looking example data (the two matches are warning
+      statements in README.md and instructions.md that say "No real client data"
+      — see execution notes).
+- [x] `git status --short` shows only intentional changes before commit.
 
 ## Branch And PR
 
-- [ ] Create a branch named `codex/ops-openclaw-prompts`.
-- [ ] Commit with a clear message.
-- [ ] Open a draft pull request linked to issue #5.
-- [ ] PR description includes prompt design decisions, examples added, deferred
+- [x] Create a branch named `codex/ops-openclaw-prompts`.
+- [x] Commit with a clear message.
+- [x] Open a draft pull request linked to issue #5.
+- [x] PR description includes prompt design decisions, examples added, deferred
       work, and verification commands run.
 
 ## Execution Notes
 
-- Pending.
+**Safety phrase case sensitivity:** The test suite searched for safety phrases
+using exact case (`phrase in content`). Two phrases from `SAFETY_PHRASES` —
+`"invent prices"` and `"source of truth"` — appear in `instructions.md` as
+title-case headings ("**Invent prices.**", "## Source Of Truth"). The intent of
+the tests is to confirm the concepts are present, not a specific capitalisation.
+Fixed by lower-casing both sides of the comparison (`content.lower()`). No
+content change needed in the prompt files.
+
+**Post-review README backlog fix:** The plan-0005 commit introduced a backlog
+regression: item 5 ("Openclaw prompts and agent instructions") was not removed
+from the remaining backlog, and item 6 appeared twice. Fixed in a follow-up
+commit: removed the completed item 5 and the duplicate item 6, leaving a clean
+ordered list starting at 6.
+
+**Real-client grep false positives:** The verification grep for real-client data
+returns two matches, both from warning statements in documentation:
+- `openclaw/agents/followup-assistant/README.md`: "No real client data, phone
+  numbers, or email addresses appear in this directory."
+- `openclaw/agents/followup-assistant/instructions.md`: "No real client data,
+  real phone numbers, real email addresses, or real personal information should
+  ever appear in this repository."
+These are the correct negative-assertion statements required by the plan.
+No actual real-client data is present.

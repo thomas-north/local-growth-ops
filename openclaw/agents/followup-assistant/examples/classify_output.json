@@ -1,0 +1,9 @@
+{
+  "classification": "genuine_lead",
+  "confidence": "high",
+  "summary": "Landlord requesting an EICR for a rental property in Beeston. Straightforward in-scope request, no red flags.",
+  "recommended_next_status": "needs_reply_draft",
+  "risk_flags": [],
+  "escalation_required": false,
+  "escalation_reason": ""
+}

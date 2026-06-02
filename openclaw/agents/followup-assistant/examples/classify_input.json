@@ -1,0 +1,38 @@
+{
+  "client_config": {
+    "client_id": "example-client",
+    "business": {
+      "name": "Bright Spark Electrical",
+      "area": "South Leeds and surrounding postcodes"
+    },
+    "services": [
+      { "name": "Full rewire", "slug": "full-rewire" },
+      { "name": "Consumer unit replacement", "slug": "consumer-unit" },
+      { "name": "Fault finding and repair", "slug": "fault-finding" },
+      { "name": "Landlord electrical certificate (EICR)", "slug": "eicr" },
+      { "name": "EV charger installation", "slug": "ev-charger" }
+    ],
+    "exclusions": [
+      "Never quote fixed prices without owner approval",
+      "Never commit to availability or timescales",
+      "Never handle complaints autonomously",
+      "Never discuss non-domestic or commercial work"
+    ],
+    "escalation_triggers": [
+      "complaint or dispute",
+      "safety concern or urgent hazard",
+      "request for written guarantee or contract",
+      "legal or insurance query",
+      "abusive or distressing message"
+    ]
+  },
+  "lead": {
+    "lead_id": "a1b2c3d4-0000-0000-0000-000000000001",
+    "name": "Jane Smith",
+    "message": "Hi, I need a landlord electrical certificate for my rental property in Beeston. When are you available and roughly how much does it cost?",
+    "service_requested": "eicr",
+    "urgency": "normal",
+    "source": "website:example-client-main",
+    "received_at": "2026-06-01T10:30:00+00:00"
+  }
+}

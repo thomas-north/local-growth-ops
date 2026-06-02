@@ -1,0 +1,24 @@
+{
+  "report_title": "Weekly Lead Summary — Bright Spark Electrical — 26 May to 1 June 2026",
+  "period_summary": "Four leads received this week: one confirmed win, one replied and awaiting response, one draft awaiting operator approval, and one spam filtered automatically.",
+  "lead_counts": {
+    "total": 4,
+    "genuine_leads": 3,
+    "spam": 1,
+    "out_of_scope": 0,
+    "escalated": 0,
+    "won": 1,
+    "lost": 0,
+    "open": 2
+  },
+  "wins_or_likely_wins": [
+    { "service": "EV charger installation", "note": "Confirmed booking this week." }
+  ],
+  "stale_leads": [],
+  "recommended_actions": [
+    "Review and send the draft reply waiting for approval (full rewire enquiry).",
+    "Follow up on the EICR enquiry if no response is received by mid-week."
+  ],
+  "client_facing_summary": "A solid week for new enquiries. One EV charger job confirmed, one EICR enquiry is progressing well, and a full rewire quote request is being prepared. One piece of spam was automatically filtered and required no action.",
+  "operator_notes": "Leads a1b2c3d4 (EICR) and d4e5f6a7 (rewire) are both open. d4e5f6a7 has a draft awaiting your approval — review before the end of the day. No escalations this week."
+}

@@ -1,0 +1,7 @@
+{
+  "draft_body": "Hi Jane,\n\nJust a quick follow-up on your EICR enquiry from earlier this week. If you're still looking for an electrician, we'd love to help — just reply to this message or give us a call at your convenience.\n\nTom, Bright Spark Electrical",
+  "followup_number": 1,
+  "operator_notes": "First follow-up. Short and low-pressure. One more follow-up is permitted under the client config (max_followups: 2).",
+  "approval_required": true,
+  "should_stop_followups": false
+}

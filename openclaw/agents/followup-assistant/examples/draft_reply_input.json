@@ -1,0 +1,40 @@
+{
+  "client_config": {
+    "client_id": "example-client",
+    "business": {
+      "name": "Bright Spark Electrical",
+      "area": "South Leeds and surrounding postcodes",
+      "phone": "0113 000 0000"
+    },
+    "services": [
+      { "name": "Landlord electrical certificate (EICR)", "slug": "eicr" }
+    ],
+    "pricing_policy": "Do not quote specific prices. Say that pricing depends on the job scope and that the owner will provide a quote after a site visit or phone call.",
+    "hours": {
+      "monday_friday": "08:00–18:00",
+      "saturday": "09:00–13:00",
+      "sunday": "Closed"
+    },
+    "tone": {
+      "style": "Friendly, plain-English, no jargon",
+      "length": "Keep replies concise — two to three short paragraphs maximum",
+      "sign_off": "Tom, Bright Spark Electrical"
+    },
+    "exclusions": [
+      "Never quote fixed prices without owner approval",
+      "Never commit to availability or timescales",
+      "Never discuss non-domestic or commercial work"
+    ]
+  },
+  "lead": {
+    "lead_id": "a1b2c3d4-0000-0000-0000-000000000001",
+    "name": "Jane Smith",
+    "message": "Hi, I need a landlord electrical certificate for my rental property in Beeston. When are you available and roughly how much does it cost?",
+    "service_requested": "eicr",
+    "urgency": "normal",
+    "contact": {
+      "preferred_method": "email"
+    },
+    "received_at": "2026-06-01T10:30:00+00:00"
+  }
+}
