@@ -187,48 +187,73 @@ Use fictional data only.
 
 ## Tasks
 
-- [ ] Review prompt output shapes in `openclaw/agents/followup-assistant/prompts/`.
-- [ ] Add assistant workflow schemas.
-- [ ] Add draft/audit storage helpers.
-- [ ] Add deterministic dry-run classification logic.
-- [ ] Add deterministic safe draft reply logic.
-- [ ] Add command to process one lead.
-- [ ] Add command to process new leads in bulk.
-- [ ] Update lead statuses as part of processing.
-- [ ] Write `drafts.jsonl` assistant run records.
-- [ ] Write `audit.jsonl` audit records.
-- [ ] Add tests for genuine lead drafting.
-- [ ] Add tests for complaint escalation.
-- [ ] Add tests for spam handling.
-- [ ] Add tests for out-of-scope handling.
-- [ ] Add tests for storage paths and command behavior.
-- [ ] Update README/docs.
-- [ ] Update this plan's checkboxes and execution notes.
+- [x] Review prompt output shapes in `openclaw/agents/followup-assistant/prompts/`.
+- [x] Add assistant workflow schemas.
+- [x] Add draft/audit storage helpers.
+- [x] Add deterministic dry-run classification logic.
+- [x] Add deterministic safe draft reply logic.
+- [x] Add command to process one lead.
+- [x] Add command to process new leads in bulk.
+- [x] Update lead statuses as part of processing.
+- [x] Write `drafts.jsonl` assistant run records.
+- [x] Write `audit.jsonl` audit records.
+- [x] Add tests for genuine lead drafting.
+- [x] Add tests for complaint escalation.
+- [x] Add tests for spam handling.
+- [x] Add tests for out-of-scope handling.
+- [x] Add tests for storage paths and command behavior.
+- [x] Update README/docs.
+- [x] Update this plan's checkboxes and execution notes.
 
 ## Verification
 
-- [ ] `python3.11 --version` satisfies `pyproject.toml`.
-- [ ] `python3.11 -m pip install -e ".[dev]"` succeeds.
-- [ ] `LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.manual_lead example-client --name "Draft Test" --email "draft@example.invalid" --service "eicr" --message "Please quote for an EICR"` succeeds.
-- [ ] `LOCAL_GROWTH_STATE_ROOT="<same tmp dir>" python3.11 -m lead_hub.process_new_leads example-client --dry-run` succeeds and prints a concise summary.
-- [ ] `LOCAL_GROWTH_STATE_ROOT="<same tmp dir>" python3.11 -m lead_hub.list_leads example-client` shows the processed lead status changed.
-- [ ] `python3.11 -m pytest tests/` succeeds.
-- [ ] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
-- [ ] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning openclaw pyproject.toml`
-      returns no unapproved stale command/path references.
-- [ ] `rg -n "approval_required.*false|send without|fixed price|guarantee|available tomorrow" lead_hub tests openclaw`
-      returns no unsafe dry-run output, unless an execution note explains a
-      quoted negative rule or test assertion.
-- [ ] `git status --short` shows only intentional changes before commit.
+- [x] `python3.11 --version` satisfies `pyproject.toml` (3.11.15).
+- [x] `python3.11 -m pip install -e ".[dev]"` succeeds.
+- [x] `LOCAL_GROWTH_STATE_ROOT="$(mktemp -d)" python3.11 -m lead_hub.manual_lead example-client --name "Draft Test" --email "draft@example.invalid" --service "eicr" --message "Please quote for an EICR"` succeeds.
+- [x] `LOCAL_GROWTH_STATE_ROOT="<same tmp dir>" python3.11 -m lead_hub.process_new_leads example-client --dry-run` succeeds and prints a concise summary.
+- [x] `LOCAL_GROWTH_STATE_ROOT="<same tmp dir>" python3.11 -m lead_hub.list_leads example-client` shows the processed lead status changed (new → awaiting_approval).
+- [x] `python3.11 -m pytest tests/` succeeds (257 passed: 63 config + 42 storage + 39 intake + 75 prompts + 38 workflow).
+- [x] `python3.11 -m compileall lead_hub openclaw tests -q` succeeds.
+- [x] `rg -n --pcre2 "python3(?!\\.11)|python -m|state/<|config.example.yaml" README.md docs lead_hub tests planning openclaw pyproject.toml`
+      returns no unapproved stale command/path references (all matches are
+      historical execution notes or plan verification text).
+- [x] `rg -n "approval_required.*false|send without|fixed price|guarantee|available tomorrow" lead_hub tests openclaw`
+      returns no unsafe dry-run output — all matches are rule definitions and
+      prohibition statements, not actual output values. See execution notes.
+- [x] `git status --short` shows only intentional changes before commit.
 
 ## Branch And PR
 
-- [ ] Create a branch named `codex/ops-lead-draft-workflow`.
-- [ ] Commit with a clear message.
-- [ ] Open a draft pull request linked to issue #6.
-- [ ] PR description includes workflow decisions, dry-run semantics, storage
+- [x] Create a branch named `codex/ops-lead-draft-workflow`.
+- [x] Commit with a clear message.
+- [x] Open a draft pull request linked to issue #6.
+- [x] PR description includes workflow decisions, dry-run semantics, storage
       paths, deferred Openclaw integration, and verification commands run.
 
 ## Execution Notes
 
-- Pending.
+**`--dry-run` flag semantics:** The plan notes ambiguity about whether `--dry-run`
+means no-write or use-local-adapter. Chose use-local-adapter semantics per the
+plan's explicit guidance: "writes are expected." Flag is accepted by both commands
+and documented in their docstrings. A future plan connecting Openclaw can remove
+the flag or give it the adapter-selection meaning.
+
+**`guarantee` keyword excluded from escalation heuristics:** The word "guarantee"
+and "guaranteed" appear in spam phrases (e.g. "guaranteed leads SEO"). Including
+them in `_ESCALATION_KEYWORDS` caused spam classification to be pre-empted by
+escalation. Removed from the keyword set; escalation for genuine guarantee
+requests is handled by the config trigger "request for written guarantee or
+contract", which is a phrase-level match that does not fire on "guaranteed leads".
+Documented with an inline comment in `lead_hub/assistant.py`. Added an execution
+note here to explain the safety-grep matches for "guarantee" in `assistant.py`
+(all are rule-definitions or keyword-set comments, not unsafe output).
+
+**Safety grep false positives:** The verification grep for unsafe output found
+matches in rule definitions, inline comments, and prompt files — all statements
+prohibiting the dangerous behaviour, not emitting it:
+- `lead_hub/assistant.py`: "No invented prices, availability promises, or
+  guarantees in drafts." (module docstring rule) and "guaranteed leads" in the
+  spam keyword set.
+- `openclaw/agents/followup-assistant/`: "Do not make commitments about
+  guarantees", "approval_required must always be true. Do not set it to false."
+  — all prohibitions, not violations.
