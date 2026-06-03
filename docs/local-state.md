@@ -18,9 +18,13 @@ The structure is:
   clients/
     example-client/
       leads.jsonl          # live lead records — never commit
+      drafts.jsonl         # AssistantRun records (classification + draft output) — never commit
+      audit.jsonl          # AuditEvent records (append-only activity log) — never commit
       state.json           # runtime state (last run, counts) — never commit
     <real-client-slug>/
       leads.jsonl
+      drafts.jsonl
+      audit.jsonl
       state.json
   logs/
     followup-assistant.log
@@ -40,6 +44,8 @@ The structure is:
 |-----------|----------|------------|
 | Client assistant config | `clients/<slug>/config.yaml` in repo | Yes (no secrets) |
 | Live leads | `/var/openclaw/clients/<slug>/leads.jsonl` | **Never** |
+| Assistant run records | `/var/openclaw/clients/<slug>/drafts.jsonl` | **Never** |
+| Audit log | `/var/openclaw/clients/<slug>/audit.jsonl` | **Never** |
 | Runtime state | `/var/openclaw/clients/<slug>/state.json` | **Never** |
 | Logs | `/var/openclaw/logs/` | **Never** |
 | Exports / reports | `/var/openclaw/exports/` | **Never** |
