@@ -100,10 +100,11 @@ The assistant must:
   examples), 75-test validation suite.
 - Plan 0006 complete: deterministic dry-run workflow, assistant schemas,
   draft/audit storage, `process_lead` / `process_new_leads` commands, 38-test suite.
+- Plan 0007 complete: Telegram operator approval notification, `notify_approvals`
+  command, PII-minimised message format, dry-run mode, 30-test suite.
 
 Remaining backlog:
 
-7. Telegram operator approval workflow.
 8. Follow-up scheduler and weekly client report.
 9. Mac mini production runbook.
 10. Privacy, retention, and safety policy.
@@ -185,6 +186,21 @@ Process all new leads:
 ```bash
 LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.process_new_leads \
   example-client --dry-run
+```
+
+Send operator approval notifications to Telegram (dry-run prints message, no network call):
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.notify_approvals \
+  example-client --dry-run
+```
+
+Live mode requires env vars loaded from `/var/openclaw/secrets/telegram.env`:
+
+```bash
+source /var/openclaw/secrets/telegram.env
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.notify_approvals \
+  example-client
 ```
 
 Planned commands (not yet implemented):
