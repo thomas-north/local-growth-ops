@@ -253,12 +253,35 @@ the notification. If approved:
 
 1. Copy the draft reply from the notification.
 2. Send it manually via email/phone (no auto-send in MVP).
-3. Mark the lead as replied:
+3. Mark the lead as replied and schedule its first follow-up:
 
 ```bash
-# There is no mark-replied CLI yet -- update status programmatically for now.
-# A convenience command will be added in a future plan.
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 - <<'PY'
+from datetime import datetime, timedelta, timezone
+from lead_hub.config_loader import load_client_config
+from lead_hub.schemas.lead import LeadStatus
+from lead_hub.storage import read_leads, update_lead_status
+
+client_slug = "<client-slug>"
+lead_id = "<lead-id>"
+
+config = load_client_config(client_slug)
+lead = next(l for l in read_leads(client_slug) if l.lead_id == lead_id)
+next_followup = datetime.now(tz=timezone.utc) + timedelta(
+    days=config.followup.first_followup_days
+)
+update_lead_status(
+    client_slug,
+    lead.lead_id,
+    LeadStatus.replied,
+    next_followup_at=next_followup,
+)
+print(f"Marked {lead.lead_id[:8]} as replied; next follow-up at {next_followup.isoformat()}")
+PY
 ```
+
+A convenience `mark_replied` CLI may be added in a future plan. Until then, use
+the snippet above after manually sending an approved reply.
 
 ### 3.6 Process Due Follow-ups
 
@@ -300,19 +323,24 @@ LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.weekly_report \
 2. Send `/newbot` and follow the prompts.
 3. Copy the token you receive -- it is the TELEGRAM_BOT_TOKEN value.
 4. Add the bot to your operator group or start a private chat with it.
-5. Send a message in the chat, then fetch the chat ID:
+5. Write the token to `/var/openclaw/secrets/telegram.env`, source it, send a
+   message in the chat, then fetch the chat ID:
 
 ```bash
-curl "https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates" | python3.11 -m json.tool
+. /var/openclaw/secrets/telegram.env
+curl "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates" | python3.11 -m json.tool
 # Look for "chat": {"id": ...} in the result.
 ```
 
-6. Write both values to `/var/openclaw/secrets/telegram.env`:
+6. Add the chat ID to `/var/openclaw/secrets/telegram.env`:
 
 ```bash
 TELEGRAM_BOT_TOKEN=<token>
 TELEGRAM_CHAT_ID=<chat-id>
 ```
+
+Do not paste the real bot token directly into shell commands. Keep it in the
+secrets file and reference it through the environment variable.
 
 ### Verifying Notifications Work
 
@@ -370,13 +398,13 @@ Example crontab entries (run `crontab -e` to edit):
 # Adjust the client slug and paths as needed.
 
 # Source secrets and process new leads
-0 8 * * 1-5 source /var/openclaw/secrets/telegram.env && \
+0 8 * * 1-5 . /var/openclaw/secrets/telegram.env && \
   LOCAL_GROWTH_STATE_ROOT="/var/openclaw" \
   /opt/homebrew/bin/python3.11 -m lead_hub.process_new_leads <client-slug> \
   --dry-run >> /var/openclaw/logs/followup-assistant.log 2>&1
 
 # Send operator approval notifications
-5 8 * * 1-5 source /var/openclaw/secrets/telegram.env && \
+5 8 * * 1-5 . /var/openclaw/secrets/telegram.env && \
   LOCAL_GROWTH_STATE_ROOT="/var/openclaw" \
   /opt/homebrew/bin/python3.11 -m lead_hub.notify_approvals <client-slug> \
   >> /var/openclaw/logs/followup-assistant.log 2>&1
@@ -719,7 +747,7 @@ Common cron issues on macOS:
 - Grant "Full Disk Access" to `/usr/sbin/cron` in System Settings >
   Privacy and Security > Full Disk Access.
 - Use absolute paths to all executables in the crontab.
-- Source secrets inside the cron command; cron does not inherit shell env.
+- Source secrets inside the cron command with `.`; cron does not inherit shell env.
 
 ---
 
