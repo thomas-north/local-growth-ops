@@ -60,6 +60,18 @@ is the only irreplaceable operational data.
 
 See `runbooks/mac-mini-production.md` Section 7 for the full backup procedure.
 
+## Retention
+
+Retention periods for lead records and PII fields are configured per client in
+`clients/<slug>/config.yaml` under the `retention` key:
+
+- `lead_retention_days`: how long to keep full lead records
+- `delete_pii_after_days`: how long before name/email/phone/message must be
+  cleared (must be >= lead_retention_days)
+
+For deletion procedures, subject access requests, and backup retention rules,
+see `docs/privacy-retention-safety.md`.
+
 ## Secrets
 
 Load secrets from environment files at runtime. Never hard-code tokens or

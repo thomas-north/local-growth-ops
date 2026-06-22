@@ -749,7 +749,21 @@ Common cron issues on macOS:
 - Use absolute paths to all executables in the crontab.
 - Source secrets inside the cron command with `.`; cron does not inherit shell env.
 
+### Data Sent to the Wrong Place
+
+If lead data (a Telegram notification, an exported report, a JSONL file) is
+accidentally sent to the wrong recipient:
+
+1. Stop further sends immediately. Pause the affected client (Section 11).
+2. Check audit.jsonl for `notification_sent` events to identify affected leads.
+3. Record the incident: timestamp, affected lead IDs, data exposed, recipient,
+   and how it was discovered.
+4. Follow the incident response procedure in
+   `docs/privacy-retention-safety.md` Section 5.6.
+
 ---
 
 *This runbook covers the supervised MVP workflow only. No customer-facing messages
 are sent automatically. All operator actions require human review and manual send.*
+*For data minimisation, retention schedules, and subject access/deletion requests,
+see `docs/privacy-retention-safety.md`.*
