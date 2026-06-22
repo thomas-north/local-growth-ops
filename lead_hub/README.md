@@ -18,15 +18,22 @@ This package owns:
 - Normalized lead model: `lead_hub.schemas.lead` (Pydantic v2)
 - Intake payloads: `lead_hub.schemas.intake` — `WebsiteLeadPayload` and
   `ManualLeadPayload` with converters to `NormalizedLead`
+- Workflow outputs: `lead_hub.schemas.assistant_workflow` — `EscalationCheck`,
+  `LeadClassification`, `DraftReply`, `AssistantRun`, `AuditEvent`
 
 See [docs/website-payload-contract.md](../docs/website-payload-contract.md)
 for the full website payload schema shared with `local-growth-sites`.
 
 ## State Root
 
-Production:  `/var/openclaw/clients/<client-slug>/leads.jsonl`
-Development: set `LOCAL_GROWTH_STATE_ROOT=<path>` to override.
+```
+/var/openclaw/clients/<client-slug>/
+  leads.jsonl     — normalized lead records
+  drafts.jsonl    — AssistantRun records (classification + draft output)
+  audit.jsonl     — AuditEvent records (append-only activity log)
+```
 
+Development: set `LOCAL_GROWTH_STATE_ROOT=<path>` to override.
 State files are never committed to git. See `docs/local-state.md`.
 
 ## Commands
@@ -67,6 +74,23 @@ python3.11 -m lead_hub.ingest_website_payload <client-slug> <payload.json>
 Validates the client config, validates the JSON payload against
 `WebsiteLeadPayload`, enforces `privacy_accepted=true` and client ID match,
 then appends a `NormalizedLead` to the JSONL store.
+
+### Process a single lead
+
+```bash
+python3.11 -m lead_hub.process_lead <client-slug> <lead-id> [--dry-run]
+```
+
+Classifies one lead, writes an `AssistantRun` to `drafts.jsonl` and an
+`AuditEvent` to `audit.jsonl`, and updates lead status.
+
+### Process all new leads
+
+```bash
+python3.11 -m lead_hub.process_new_leads <client-slug> [--dry-run]
+```
+
+Processes every lead in `new` status. Same storage outputs as above.
 
 All commands: exit 0 on success, 1 on error, 2 on missing argument.
 

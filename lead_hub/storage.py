@@ -1,11 +1,13 @@
 """
 lead_hub.storage
 ~~~~~~~~~~~~~~~~
-JSONL storage helpers for the normalized lead model.
+JSONL storage helpers for the normalized lead model, draft runs, and audit log.
 
 State root resolution
 ---------------------
 Production:  /var/openclaw/clients/<client-slug>/leads.jsonl
+             /var/openclaw/clients/<client-slug>/drafts.jsonl
+             /var/openclaw/clients/<client-slug>/audit.jsonl
 Development: set LOCAL_GROWTH_STATE_ROOT=<path> to override.
 
 The canonical path is documented in docs/local-state.md.
@@ -48,6 +50,16 @@ def client_dir(client_slug: str) -> Path:
 def leads_path(client_slug: str) -> Path:
     """Return the JSONL path for a client's leads."""
     return client_dir(client_slug) / "leads.jsonl"
+
+
+def drafts_path(client_slug: str) -> Path:
+    """Return the JSONL path for a client's assistant run records."""
+    return client_dir(client_slug) / "drafts.jsonl"
+
+
+def audit_path(client_slug: str) -> Path:
+    """Return the JSONL path for a client's audit log."""
+    return client_dir(client_slug) / "audit.jsonl"
 
 
 # ---------------------------------------------------------------------------
@@ -145,3 +157,50 @@ def list_due_followups(
         for lead in read_leads(client_slug)
         if lead.next_followup_at is not None and lead.next_followup_at <= now
     ]
+
+
+# ---------------------------------------------------------------------------
+# Draft and audit JSONL helpers
+# ---------------------------------------------------------------------------
+
+
+def append_assistant_run(client_slug: str, run: "AssistantRun") -> None:  # type: ignore[name-defined]
+    """Append an AssistantRun record to drafts.jsonl."""
+    path = drafts_path(client_slug)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(run.model_dump_json() + "\n")
+
+
+def read_assistant_runs(client_slug: str) -> list["AssistantRun"]:  # type: ignore[name-defined]
+    """Read all AssistantRun records for a client."""
+    from lead_hub.schemas.assistant_workflow import AssistantRun
+    path = drafts_path(client_slug)
+    if not path.exists():
+        return []
+    runs = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line:
+            runs.append(AssistantRun.model_validate_json(line))
+    return runs
+
+
+def append_audit_event(client_slug: str, event: "AuditEvent") -> None:  # type: ignore[name-defined]
+    """Append an AuditEvent to audit.jsonl."""
+    path = audit_path(client_slug)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(event.model_dump_json() + "\n")
+
+
+def read_audit_events(client_slug: str) -> list["AuditEvent"]:  # type: ignore[name-defined]
+    """Read all AuditEvent records for a client."""
+    from lead_hub.schemas.assistant_workflow import AuditEvent
+    path = audit_path(client_slug)
+    if not path.exists():
+        return []
+    events = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line:
+            events.append(AuditEvent.model_validate_json(line))
+    return events

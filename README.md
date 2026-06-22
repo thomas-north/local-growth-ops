@@ -98,10 +98,11 @@ The assistant must:
   command, refactored `manual_lead`, website contract docs, 36-test suite.
 - Plan 0005 complete: Openclaw prompt library (instructions, 5 prompts, 10 JSON
   examples), 75-test validation suite.
+- Plan 0006 complete: deterministic dry-run workflow, assistant schemas,
+  draft/audit storage, `process_lead` / `process_new_leads` commands, 38-test suite.
 
 Remaining backlog:
 
-6. Lead classification and draft reply workflow.
 7. Telegram operator approval workflow.
 8. Follow-up scheduler and weekly client report.
 9. Mac mini production runbook.
@@ -171,6 +172,20 @@ LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.ingest_website_pa
 
 See [docs/website-payload-contract.md](docs/website-payload-contract.md) for
 the full payload schema.
+
+Process a single lead (dry-run classification + draft):
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.process_lead \
+  example-client <lead-id> --dry-run
+```
+
+Process all new leads:
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.process_new_leads \
+  example-client --dry-run
+```
 
 Planned commands (not yet implemented):
 
