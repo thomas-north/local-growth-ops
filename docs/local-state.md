@@ -58,7 +58,7 @@ Back up `/var/openclaw/` on a regular schedule (weekly minimum). The repo
 itself does not contain anything that cannot be recloned; the state directory
 is the only irreplaceable operational data.
 
-See `runbooks/backup-procedure.md` (to be written in plan 0009).
+See `runbooks/mac-mini-production.md` Section 7 for the full backup procedure.
 
 ## Secrets
 
