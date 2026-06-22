@@ -102,10 +102,10 @@ The assistant must:
   draft/audit storage, `process_lead` / `process_new_leads` commands, 38-test suite.
 - Plan 0007 complete: Telegram operator approval notification, `notify_approvals`
   command, PII-minimised message format, dry-run mode, 30-test suite.
+- Plan 0008 complete: follow-up scheduler, `process_due_followups` command,
+  `weekly_report` command, exclusion rules, 43-test suite.
 
 Remaining backlog:
-
-8. Follow-up scheduler and weekly client report.
 9. Mac mini production runbook.
 10. Privacy, retention, and safety policy.
 11. External-agent implementation brief.
@@ -203,8 +203,16 @@ LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.notify_approvals 
   example-client
 ```
 
-Planned commands (not yet implemented):
+Process due follow-ups (generates operator-review drafts for leads whose follow-up date has passed):
 
 ```bash
-python3.11 -m lead_hub.weekly_report example-client
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.process_due_followups \
+  example-client --dry-run
+```
+
+Generate a weekly operations report:
+
+```bash
+LOCAL_GROWTH_STATE_ROOT="/var/openclaw" python3.11 -m lead_hub.weekly_report \
+  example-client
 ```

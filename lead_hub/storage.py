@@ -104,10 +104,17 @@ def update_lead_status(
     lead_id: str,
     new_status: LeadStatus,
     next_followup_at: Optional[datetime] = None,
+    clear_next_followup_at: bool = False,
 ) -> NormalizedLead:
     """Update the status (and optionally follow-up timestamp) of a lead.
 
-    Rewrites the full JSONL file — acceptable for MVP volumes.
+    Rewrites the full JSONL file -- acceptable for MVP volumes.
+
+    next_followup_at behaviour:
+    - Default (None): keep the existing next_followup_at unchanged.
+    - Datetime value: replace next_followup_at with the given value.
+    - clear_next_followup_at=True: explicitly set next_followup_at to None,
+      regardless of the next_followup_at argument.
 
     Raises
     ------
@@ -120,12 +127,16 @@ def update_lead_status(
 
     for lead in leads:
         if lead.lead_id == lead_id:
+            if clear_next_followup_at:
+                resolved_followup = None
+            elif next_followup_at is not None:
+                resolved_followup = next_followup_at
+            else:
+                resolved_followup = lead.next_followup_at
             updated = lead.model_copy(
                 update={
                     "status": new_status,
-                    "next_followup_at": next_followup_at
-                    if next_followup_at is not None
-                    else lead.next_followup_at,
+                    "next_followup_at": resolved_followup,
                 }
             )
             new_leads.append(updated)
