@@ -29,10 +29,11 @@ import uuid
 from datetime import datetime, timezone
 
 from lead_hub.config_loader import load_client_config
-from lead_hub.schemas.assistant_workflow import AuditEvent, AuditEventKind
+from lead_hub.schemas.assistant_workflow import AssistantRun, AuditEvent, AuditEventKind
 from lead_hub.schemas.lead import LeadStatus
 from lead_hub.storage import (
     append_audit_event,
+    read_audit_events,
     read_assistant_runs,
     read_leads,
 )
@@ -102,9 +103,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     runs = read_assistant_runs(client_slug)
-    runs_by_lead: dict[str, object] = {r.lead_id: r for r in runs}
+    runs_by_lead: dict[str, AssistantRun] = {r.lead_id: r for r in runs}
+    notified_run_ids = {
+        event.detail.rsplit("Run ID: ", 1)[1].rstrip(".")
+        for event in read_audit_events(client_slug)
+        if event.kind == AuditEventKind.notification_sent
+        and "Run ID: " in event.detail
+    }
 
     sent = 0
+    skipped = 0
     errors = 0
 
     for lead in pending:
@@ -120,6 +128,13 @@ def main(argv: list[str] | None = None) -> int:
                 f"SKIP: {lead.lead_id[:8]}  {lead.name} — no draft reply in run",
                 file=sys.stderr,
             )
+            continue
+        if run.run_id[:8] in notified_run_ids:
+            print(
+                f"SKIP: {lead.lead_id[:8]}  {lead.name} — approval notification already sent for run {run.run_id[:8]}",
+                file=sys.stderr,
+            )
+            skipped += 1
             continue
 
         # 4a. Format message.
@@ -171,7 +186,10 @@ def main(argv: list[str] | None = None) -> int:
         sent += 1
 
     summary_suffix = " (dry-run)" if dry_run else ""
-    print(f"\nDone: {sent} notification(s){summary_suffix}, {errors} error(s).")
+    print(
+        f"\nDone: {sent} notification(s){summary_suffix}, "
+        f"{skipped} already notified, {errors} error(s)."
+    )
     return 0 if errors == 0 else 1
 
 

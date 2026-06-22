@@ -41,6 +41,7 @@ from lead_hub.storage import (
 from lead_hub.telegram_approval import (
     TelegramSendError,
     format_approval_message,
+    redact_contact_details,
     resolve_bot_token,
     resolve_chat_id,
 )
@@ -225,6 +226,20 @@ class TestFormatApprovalMessage:
         msg = format_approval_message(lead, run, config)
         assert "07700900000" not in msg
 
+    def test_redacts_email_from_message_excerpt(self, config):
+        lead = _make_lead(message="Please email me at private@example.invalid about the EICR.")
+        run = _make_run(lead)
+        msg = format_approval_message(lead, run, config)
+        assert "private@example.invalid" not in msg
+        assert "[email redacted]" in msg
+
+    def test_redacts_phone_from_message_excerpt(self, config):
+        lead = _make_lead(message="Please call me on 07700 900123 about the EICR.")
+        run = _make_run(lead)
+        msg = format_approval_message(lead, run, config)
+        assert "07700 900123" not in msg
+        assert "[phone redacted]" in msg
+
     def test_long_message_is_excerpted(self, config):
         long_message = "A" * 500
         lead = _make_lead(message=long_message)
@@ -272,6 +287,23 @@ class TestCredentialResolution:
         monkeypatch.delenv("TELEGRAM_CHAT_ID", raising=False)
         # config has empty telegram_chat_id
         assert resolve_chat_id(config) is None
+
+
+# ---------------------------------------------------------------------------
+# PII redaction helper
+# ---------------------------------------------------------------------------
+
+
+class TestRedactContactDetails:
+    def test_redacts_email_address(self):
+        assert redact_contact_details("Email x@example.invalid please") == (
+            "Email [email redacted] please"
+        )
+
+    def test_redacts_phone_number(self):
+        assert redact_contact_details("Call 07700 900123 today") == (
+            "Call [phone redacted] today"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -490,3 +522,17 @@ class TestNotifyApprovalsCLI:
         events = read_audit_events("example-client")
         notification_events = [e for e in events if e.kind == AuditEventKind.notification_sent]
         assert len(notification_events) == 3
+
+    def test_second_run_skips_already_notified_draft(self, tmp_state, config, capsys):
+        from lead_hub.notify_approvals import main
+        self._setup_lead_with_run("example-client")
+
+        assert main(["example-client", "--dry-run"]) == 0
+        assert main(["example-client", "--dry-run"]) == 0
+
+        captured = capsys.readouterr()
+        assert "already sent" in captured.err
+
+        events = read_audit_events("example-client")
+        notification_events = [e for e in events if e.kind == AuditEventKind.notification_sent]
+        assert len(notification_events) == 1

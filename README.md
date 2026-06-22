@@ -106,7 +106,6 @@ The assistant must:
 Remaining backlog:
 
 8. Follow-up scheduler and weekly client report.
-8. Follow-up scheduler and weekly client report.
 9. Mac mini production runbook.
 10. Privacy, retention, and safety policy.
 11. External-agent implementation brief.

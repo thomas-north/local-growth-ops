@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import textwrap
 import urllib.error
 import urllib.parse
@@ -38,10 +39,18 @@ from lead_hub.schemas.lead import NormalizedLead
 
 _TELEGRAM_API = "https://api.telegram.org"
 _EXCERPT_LENGTH = 300
+_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+_PHONE_RE = re.compile(r"(?<!\w)(?:\+?\d[\d\s().-]{7,}\d)(?!\w)")
 
 
 class TelegramSendError(RuntimeError):
     """Raised when the Telegram Bot API call fails."""
+
+
+def redact_contact_details(text: str) -> str:
+    """Remove obvious email addresses and phone numbers from notification text."""
+    text = _EMAIL_RE.sub("[email redacted]", text)
+    return _PHONE_RE.sub("[phone redacted]", text)
 
 
 # ---------------------------------------------------------------------------
@@ -71,7 +80,7 @@ def format_approval_message(
     esc = run.escalation_check
 
     # Excerpt the lead message — no full PII
-    excerpt = (lead.message or "").strip()
+    excerpt = redact_contact_details((lead.message or "").strip())
     if len(excerpt) > _EXCERPT_LENGTH:
         excerpt = excerpt[:_EXCERPT_LENGTH] + "…"
 
