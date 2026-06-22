@@ -182,6 +182,7 @@ class AuditEventKind(str, Enum):
     status_changed = "status_changed"
     draft_created = "draft_created"
     escalated = "escalated"
+    notification_sent = "notification_sent"
     error = "error"
 
 

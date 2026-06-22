@@ -92,6 +92,24 @@ python3.11 -m lead_hub.process_new_leads <client-slug> [--dry-run]
 
 Processes every lead in `new` status. Same storage outputs as above.
 
+### Send operator approval notifications
+
+```bash
+python3.11 -m lead_hub.notify_approvals <client-slug> [--dry-run]
+```
+
+For every lead with status `awaiting_approval` that has a non-None draft reply,
+formats and sends an operator approval notification to Telegram. Dry-run mode
+prints the message to stdout without making any network calls.
+
+Requires in live mode (load from `/var/openclaw/secrets/telegram.env`):
+- `TELEGRAM_BOT_TOKEN` — Telegram Bot API token
+- `TELEGRAM_CHAT_ID` — operator chat ID (overrides `config.approval.telegram_chat_id`)
+
+Writes an `AuditEvent` (`kind=notification_sent`) to `audit.jsonl` per lead
+notified. Exits 0 on success (including zero pending leads), 1 on error, 2 on
+missing argument.
+
 All commands: exit 0 on success, 1 on error, 2 on missing argument.
 
 ### Planned commands (plan 0008 onward)
@@ -125,5 +143,4 @@ paths.
 ## What Does Not Belong Here
 
 - Openclaw prompt text → `openclaw/agents/followup-assistant/`
-- Telegram approval logic → `openclaw/agents/followup-assistant/`
 - Operator runbooks → `runbooks/`
