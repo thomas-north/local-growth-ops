@@ -104,7 +104,6 @@ The assistant must:
 Remaining backlog:
 
 7. Telegram operator approval workflow.
-7. Telegram operator approval workflow.
 8. Follow-up scheduler and weekly client report.
 9. Mac mini production runbook.
 10. Privacy, retention, and safety policy.
