@@ -52,6 +52,7 @@ openclaw/
   agents/
     followup-assistant/     Openclaw agent instructions and prompts (plan 0005 onward)
 runbooks/                   operator setup and Mac mini production procedures
+  mac-mini-production.md    end-to-end production runbook (setup, workflow, backup, troubleshooting)
 tests/                      validation and workflow tests
 docs/
   OVERALL_PLAN.md           phased implementation plan
@@ -104,9 +105,10 @@ The assistant must:
   command, PII-minimised message format, dry-run mode, 30-test suite.
 - Plan 0008 complete: follow-up scheduler, `process_due_followups` command,
   `weekly_report` command, exclusion rules, 43-test suite.
+- Plan 0009 complete: Mac mini production runbook covering setup, daily workflow,
+  Telegram, backup, reboot recovery, client management, checklists, troubleshooting.
 
 Remaining backlog:
-9. Mac mini production runbook.
 10. Privacy, retention, and safety policy.
 11. External-agent implementation brief.
 

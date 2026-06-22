@@ -3,30 +3,28 @@
 Operator setup and production procedures for running the follow-up assistant
 on the dedicated Mac mini.
 
-## Planned Runbooks
+## Runbooks
 
-These will be written in plan 0009:
+- [mac-mini-production.md](mac-mini-production.md) -- end-to-end production
+  runbook: first-time setup, daily workflow, Telegram setup, Openclaw
+  onboarding placeholder, cron scheduling, backup, log locations, reboot
+  recovery, adding a client, pausing a client, daily/weekly checklists,
+  and troubleshooting.
 
-```
-mac-mini-setup.md          — initial Mac mini environment setup
-gateway-startup.md         — starting and verifying the Openclaw gateway
-telegram-check.md          — verifying Telegram operator notifications work
-secrets-audit.md           — confirming no secrets are in git or wrong place
-cron-setup.md              — configuring scheduled lead checks
-backup-procedure.md        — backing up lead state and client configs
-reboot-recovery.md         — restoring service after a restart
-client-pause-resume.md     — pausing and resuming a client's assistant
-```
+## Quick Reference
 
-## Daily Operator Checklist (draft)
+| Task | Command |
+|------|---------|
+| Validate config | `python3.11 -m lead_hub.validate_client <slug>` |
+| Ingest website payload | `python3.11 -m lead_hub.ingest_website_payload <slug> payload.json` |
+| Process new leads | `python3.11 -m lead_hub.process_new_leads <slug> --dry-run` |
+| Send approval notifications | `python3.11 -m lead_hub.notify_approvals <slug>` |
+| List due follow-ups | `python3.11 -m lead_hub.list_due_followups <slug>` |
+| Process due follow-ups | `python3.11 -m lead_hub.process_due_followups <slug> --dry-run` |
+| Weekly report | `python3.11 -m lead_hub.weekly_report <slug>` |
+| List all leads | `python3.11 -m lead_hub.list_leads <slug>` |
 
-- Openclaw gateway process is running.
-- Telegram notifications are arriving.
-- No leads have been stuck in "Needs reply draft" for more than 24 hours.
+All commands require `LOCAL_GROWTH_STATE_ROOT="/var/openclaw"` in production
+and `source /var/openclaw/secrets/telegram.env` before live Telegram sends.
 
-## Weekly Operator Checklist (draft)
-
-- Weekly reports have been sent for all active clients.
-- Lead JSONL files are backed up.
-- No secrets have been introduced into git (run `git log --oneline -10`).
-- Client configs are up to date.
+See [mac-mini-production.md](mac-mini-production.md) for the full runbook.
