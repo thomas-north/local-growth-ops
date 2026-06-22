@@ -57,6 +57,7 @@ tests/                      validation and workflow tests
 docs/
   OVERALL_PLAN.md           phased implementation plan
   local-state.md            where live operational data lives outside git
+  privacy-retention-safety.md  privacy, retention, and safety policy for lead handling
 planning/                   executable implementation plans (Codex writes, Claude Code executes)
 ```
 
@@ -107,9 +108,11 @@ The assistant must:
   `weekly_report` command, exclusion rules, 43-test suite.
 - Plan 0009 complete: Mac mini production runbook covering setup, daily workflow,
   Telegram, backup, reboot recovery, client management, checklists, troubleshooting.
+- Plan 0010 complete: privacy, retention, and safety policy covering data categories,
+  where data lives, retention config, deletion procedures, Telegram PII minimisation,
+  escalation rules, human-approval policy, and legal-review guidance.
 
 Remaining backlog:
-10. Privacy, retention, and safety policy.
 11. External-agent implementation brief.
 
 See [docs/OVERALL_PLAN.md](docs/OVERALL_PLAN.md) for the full phased plan.
