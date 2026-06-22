@@ -74,7 +74,7 @@ def count_followup_drafts(client_slug: str, lead_id: str) -> int:
 
 def compute_next_followup_at(
     config: ClientAssistantConfig,
-    lead_received_at: datetime,
+    current_followup_at: datetime,
     followup_number: int,
 ) -> Optional[datetime]:
     """
@@ -84,15 +84,16 @@ def compute_next_followup_at(
     followup_number is the number of follow-ups that will exist AFTER the
     current one is generated (i.e. 1 after first draft, 2 after second).
 
-    Cadence is relative to lead received_at to keep scheduling deterministic.
+    Cadence is relative to the follow-up being processed. This avoids producing
+    multiple follow-up drafts back-to-back for older leads.
     """
     fc = config.followup
     if followup_number >= fc.max_followups:
         return None
     if followup_number == 0:
-        return lead_received_at + timedelta(days=fc.first_followup_days)
+        return current_followup_at + timedelta(days=fc.first_followup_days)
     if followup_number == 1:
-        return lead_received_at + timedelta(days=fc.second_followup_days)
+        return current_followup_at + timedelta(days=fc.second_followup_days)
     # Beyond two configured slots: no further follow-up
     return None
 

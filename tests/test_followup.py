@@ -388,6 +388,7 @@ class TestProcessDueFollowupsCLI:
         leads = read_leads("example-client")
         # After first follow-up, next_followup_at should be set
         assert leads[0].next_followup_at is not None
+        assert leads[0].next_followup_at > _NOW
 
     def test_next_followup_at_cleared_after_last(self, tmp_state, config):
         from lead_hub.process_due_followups import main
@@ -401,6 +402,36 @@ class TestProcessDueFollowupsCLI:
         main(["example-client", "--dry-run"])
         leads = read_leads("example-client")
         assert leads[0].next_followup_at is None
+
+    def test_old_due_lead_not_processed_twice_back_to_back(self, tmp_state, config):
+        from lead_hub.process_due_followups import main
+        from lead_hub.storage import read_leads
+        old_lead = new_lead(
+            client_id="example-client",
+            source="manual",
+            name="Old Lead",
+            contact=ContactInfo(email="old@example.invalid"),
+            message="Please quote for an EICR.",
+            service_requested="eicr",
+            urgency=Urgency.normal,
+            consent=ConsentInfo(privacy_accepted=False),
+            next_followup_at=_PAST,
+        ).model_copy(
+            update={
+                "status": LeadStatus.replied,
+                "received_at": _NOW - timedelta(days=30),
+            }
+        )
+        append_lead("example-client", old_lead)
+
+        assert main(["example-client", "--dry-run"]) == 0
+        assert main(["example-client", "--dry-run"]) == 0
+
+        runs = read_assistant_runs("example-client")
+        leads = read_leads("example-client")
+        assert len(runs) == 1
+        assert leads[0].next_followup_at is not None
+        assert leads[0].next_followup_at > _NOW
 
 
 # ---------------------------------------------------------------------------

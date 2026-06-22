@@ -20,6 +20,7 @@ Exits 0 on success (including zero due leads), 1 on error, 2 on usage error.
 from __future__ import annotations
 
 import sys
+from datetime import datetime, timezone
 
 from lead_hub.config_loader import load_client_config
 from lead_hub.followup_scheduler import (
@@ -65,8 +66,9 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     # 2. Get due leads.
+    as_of = datetime.now(tz=timezone.utc)
     try:
-        due = list_due_followups(client_slug)
+        due = list_due_followups(client_slug, as_of=as_of)
     except Exception as exc:
         print(f"ERROR: could not read leads: {exc}", file=sys.stderr)
         return 1
@@ -120,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
 
         # 7. Compute next follow-up date.
         next_followup = compute_next_followup_at(
-            config, lead.received_at, followup_count + 1
+            config, as_of, followup_count + 1
         )
 
         # 8. Persist.
