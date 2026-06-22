@@ -112,11 +112,33 @@ missing argument.
 
 All commands: exit 0 on success, 1 on error, 2 on missing argument.
 
-### Planned commands (plan 0008 onward)
+### Process due follow-ups
 
 ```bash
-python3.11 -m lead_hub.weekly_report example-client
+python3.11 -m lead_hub.process_due_followups <client-slug> [--dry-run]
 ```
+
+For every lead whose `next_followup_at` is at or before now, and whose status is
+`replied` or `followup_scheduled`, generates a safe follow-up draft requiring
+operator approval. Leads in spam, escalated, closed, won, or lost status are
+skipped. Leads that have reached `config.followup.max_followups` are also skipped.
+
+Writes an `AssistantRun` to `drafts.jsonl` and an `AuditEvent`
+(`kind=followup_draft_created`) to `audit.jsonl` per lead processed. Updates
+`next_followup_at` to the next scheduled date, or clears it when max_followups
+is reached.
+
+### Generate a weekly report
+
+```bash
+python3.11 -m lead_hub.weekly_report <client-slug>
+```
+
+Prints a plain-text weekly summary to stdout covering lead counts by status,
+pending approvals, due follow-ups, open escalations, and recommended operator
+actions. No PII (emails or phone numbers) appears in report output.
+
+All commands: exit 0 on success, 1 on error, 2 on missing argument.
 
 ## Lead Status Flow
 
