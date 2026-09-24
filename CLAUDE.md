@@ -80,7 +80,11 @@ This repo owns private operations:
 - privacy and retention policy
 
 This repo does not own public website templates, Astro components, Cloudflare
-Pages site code, or client website assets. Those belong in `local-growth-sites`.
+Pages site code, client website assets, page-visibility settings, content
+collections, or website content-completeness audits. Those belong in
+`local-growth-sites`. This repo owns lead intake and follow-up after a website
+submits the documented payload; keep cross-repository changes coordinated
+through that public intake contract rather than duplicating site behavior here.
 
 ## Planning Convention
 
