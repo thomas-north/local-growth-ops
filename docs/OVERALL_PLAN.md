@@ -146,6 +146,10 @@ Definition of done:
 
 ## Initial GitHub Issue Order
 
+This is the historical implementation order, not the current backlog. Plans
+0001-0010 are complete. The external-agent brief issue was closed as no longer
+needed after the project moved to Codex-managed implementation.
+
 1. Scaffold follow-up assistant ops workspace.
 2. Define client assistant config schema.
 3. Implement lead hub storage and normalized lead model.
@@ -156,11 +160,11 @@ Definition of done:
 8. Implement follow-up scheduler and weekly client report.
 9. Document Mac mini Openclaw production runbook.
 10. Create privacy, retention, and safety policy for lead handling.
-11. Create external-agent implementation brief.
 
 ## Assumptions
 
-- Openclaw runs centrally on the dedicated Mac mini.
+- Openclaw is intended to run centrally on the dedicated Mac mini once a live
+  adapter is implemented and explicitly onboarded.
 - Telegram is the first operator notification channel.
 - The MVP is supervised and draft-first.
 - Clients are non-technical.
