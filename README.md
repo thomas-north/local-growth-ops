@@ -61,7 +61,7 @@ docs/
   OVERALL_PLAN.md           phased implementation plan
   local-state.md            where live operational data lives outside git
   privacy-retention-safety.md  privacy, retention, and safety policy for lead handling
-planning/                   executable implementation plans (Codex writes, Claude Code executes)
+planning/                   executable plans authored and executed by Codex
 ```
 
 Live lead state, logs, exports, and backups live **outside this repo** on the
@@ -115,8 +115,11 @@ The assistant must:
   where data lives, retention config, deletion procedures, Telegram PII minimisation,
   escalation rules, human-approval policy, and legal-review guidance.
 
-Remaining backlog:
-11. External-agent implementation brief.
+Current status: the local lead workflow, operator notifications, runbooks, and
+operational policy are in place. Hosted website intake and a live OpenClaw
+adapter are not implemented, so this repository is not yet a production-ready
+automated service. There are no active GitHub implementation issues; the next
+phase should be planned from a controlled pilot's requirements.
 
 See [docs/OVERALL_PLAN.md](docs/OVERALL_PLAN.md) for the full phased plan.
 

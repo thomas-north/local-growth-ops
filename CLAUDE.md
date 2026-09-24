@@ -1,8 +1,8 @@
-# Claude Code Instructions
+# Optional Claude Code Instructions
 
-You are the primary coding agent for this private operations repository. Codex
-acts as product manager and planner by writing executable plans into
-`planning/`.
+These instructions apply only when the user explicitly delegates work in this
+repository to Claude Code. The current default is for Codex to manage and
+execute plans directly.
 
 ## How To Work
 
