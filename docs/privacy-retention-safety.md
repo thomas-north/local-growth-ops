@@ -1,6 +1,6 @@
 # Privacy, Retention, and Safety Policy for Lead Handling
 
-**Scope:** Openclaw-powered supervised lead follow-up MVP (local-growth-ops)
+**Scope:** Supervised lead follow-up MVP (local-growth-ops)
 **Audience:** Operators managing the Mac mini production installation
 **Status:** Operational controls document -- not legal advice
 
@@ -14,14 +14,24 @@
 
 ## 1. Overview
 
-The system collects and processes limited personal data about prospective
-customers (leads) on behalf of local service business clients. Every step
-is operator-supervised: the assistant drafts; a human approves before
-anything is sent to the customer or client.
+The system is designed to process personal data about prospective customers
+(leads) on behalf of local service business clients. The repository validates
+website payloads supplied as local JSON files and supports manual lead entry;
+it does not currently expose a live website intake endpoint. After ingestion,
+the workflow uses a deterministic local adapter and does not call OpenClaw or
+an external model provider. Telegram approval notifications can be sent when
+explicitly run in live mode. Every customer-facing reply remains a manual,
+operator-approved action.
+
+The OpenClaw prompts are present, but a live model adapter is not implemented.
+Before enabling one with real lead data, document the model provider, data sent,
+provider retention and access terms, and any required client disclosures in
+this policy and the relevant client arrangements.
 
 The MVP principle is **minimum viable data**: collect only what is needed
-to draft a useful response, store it securely outside git, retain it for
-the configured period, and then delete or redact it.
+to draft a useful response, store it securely outside git, track the configured
+retention targets manually, and then delete or redact it. The software does not
+enforce those targets.
 
 ---
 
@@ -29,7 +39,10 @@ the configured period, and then delete or redact it.
 
 ### 2.1 Lead Identity and Contact Information
 
-Collected when a lead submits a website enquiry form or is entered manually.
+Website payload fields are collected when an operator ingests a form payload
+JSON file; other leads may be entered manually. The intake tool does not delete
+the input JSON file after ingestion, so the operator must secure and remove that
+copy according to the applicable retention decision.
 
 | Field | Source | Where stored |
 |-------|--------|--------------|
@@ -42,25 +55,30 @@ Collected when a lead submits a website enquiry form or is entered manually.
 | Urgency (optional) | Form / manual entry | leads.jsonl |
 | Lead ID (UUID) | Generated | leads.jsonl |
 | Received timestamp | Generated | leads.jsonl |
+| Source, status, requested service, follow-up time, owner, conversation summary | Form / operator / workflow | leads.jsonl |
 
-Contact information (email, phone) is personal data. It is stored only in
-live JSONL files on the Mac mini and is never committed to git.
+Contact information (email, phone) is personal data. After ingestion, it is
+stored in live JSONL files on the Mac mini and must never be committed to git.
+The source payload file may remain at its original path until the operator
+removes it.
 
 ### 2.2 Assistant Drafts
 
-When the assistant classifies a lead and generates a draft reply:
+When the local workflow classifies a lead and generates a draft reply, it writes
+an `AssistantRun` to `drafts.jsonl`:
 
 | Field | Source | Where stored |
 |-------|--------|--------------|
-| Classification result | Assistant | drafts.jsonl |
-| Draft reply text | Assistant | drafts.jsonl |
-| Risk flags | Assistant | drafts.jsonl |
+| Classification result and summary | Local workflow | drafts.jsonl |
+| Draft reply text, assumptions, questions, operator notes | Local workflow | drafts.jsonl |
+| Risk flags and escalation details | Local workflow | drafts.jsonl |
 | Run timestamp | Generated | drafts.jsonl |
 | Adapter ID | Generated | drafts.jsonl |
 
-Draft replies may contain the lead's name (from config) or a summary of
-their request. They are operator-facing only -- no draft is sent to the
-customer without human approval.
+Draft replies and classifications may contain the lead's name or details from
+their request. These records are personal-data-bearing even when generated
+locally. They are operator-facing only; no draft is sent to the customer by
+this system.
 
 ### 2.3 Audit Events
 
@@ -75,24 +93,31 @@ draft created, notification sent, escalation).
 | Previous / new status | System | audit.jsonl |
 | Run ID | Reference | audit.jsonl |
 
-Audit events do not include raw contact information but do reference lead
-IDs, which can be used to look up contact details in leads.jsonl.
+The current audit-event builders do not copy the lead's contact fields or
+message into `detail`, but events reference lead IDs that can be linked to
+contact details in `leads.jsonl`. Treat the audit file as personal-data-bearing
+for access, retention, and deletion decisions. Review any future adapter that
+changes what is written to `detail`. The `notification_sent` event kind is also
+used when `notify_approvals --dry-run` prints a notification locally; inspect
+its `detail` before treating it as proof of a Telegram send.
 
 ### 2.4 Telegram Notifications
 
-When the operator is notified about a lead pending approval, the Telegram
-message includes:
+When the operator is notified about a lead pending approval in live mode, the
+Telegram message currently includes:
 
-- The lead's **name** (first field of NormalizedLead)
+- Client/business name and the lead's **name**
 - A **300-character excerpt** from the lead's message (truncated)
-- Lead ID (short prefix for operator reference)
-- Classification and draft reply text
+- Lead ID (short prefix), classification, confidence, and summary
+- Escalation flags/details when present
+- The complete draft subject and body, assumptions, questions, and operator notes
 
-The system applies `redact_contact_details()` to the excerpt before
-sending, which strips email addresses and phone numbers detected by regex.
+The system applies `redact_contact_details()` to the original lead-message
+excerpt only, stripping email addresses and phone numbers detected by regex.
+It does not redact the draft, classification, business name, or lead name.
 However:
 
-- The lead's name is included and cannot be redacted without losing utility.
+- The lead's name is included and is not redacted by the formatter.
 - Long-form message content may contain additional PII not caught by regex
   (street addresses, dates of birth, account numbers, etc.).
 - Telegram is a third-party service: their privacy policy and data
@@ -104,17 +129,22 @@ forward them outside the approved operator group.
 
 ### 2.5 Weekly Reports
 
-The weekly_report command produces a plain-text summary covering:
+The `weekly_report` command produces a plain-text summary covering:
 
 - Lead counts by status
 - Pending approvals (lead ID and name, no email/phone)
-- Due follow-ups (lead ID only)
+- Due follow-ups (lead ID, name, and due date)
 - Open escalations
 - Recommended operator actions
 
 Reports are printed to stdout. They are not stored unless the operator
 redirects the output to a file. If saved to `/var/openclaw/exports/`, they
 fall under the export retention policy (section 4.4).
+
+Command output may contain lead names, message excerpts, and (in approval
+dry-run mode) the full draft and related notes. Cron output is written to
+`/var/openclaw/logs/`; treat those logs as personal-data-bearing and apply an
+operator-defined retention period.
 
 ### 2.6 Exports
 
@@ -124,16 +154,18 @@ contain identifiable information. Apply the retention limits in section 4.4.
 
 ### 2.7 Backups
 
-Full backups of `/var/openclaw/` (including JSONL files) are stored in
-`/var/openclaw/backups/`. See section 4.5 for backup retention.
+The runbook's backup command archives `/var/openclaw/clients/` (including JSONL
+files) to `/var/openclaw/backups/`; it does not include logs, exports, or
+secrets. Check any separate system-level backup scope before assuming those
+paths are covered. See section 4.5 for backup retention.
 
 ---
 
 ## 3. Where Data Lives
 
 ```
-In git (config only -- no personal data or secrets):
-  clients/<slug>/config.yaml        -- client settings, fictional example only
+In the private Git repository:
+  clients/<slug>/config.yaml        -- client settings; real values may be personal data
   lead_hub/                         -- processing logic
   openclaw/                         -- agent prompts
 
@@ -157,7 +189,22 @@ What must never be committed to git:
 - Production logs, exports, or backups
 - Any file from /var/openclaw/
 
-See `docs/local-state.md` for the canonical directory layout.
+The example config is fictional. The current config loader reads client
+configs from `clients/<slug>/config.yaml`, and the production runbook instructs
+operators to commit them. Real configs can contain personal data, particularly
+for sole traders (for example, a person's name, direct contact details, or
+location). A private repository is not a secrets vault or a guarantee that
+information is non-personal. Minimise real config data, restrict repository
+access, and review its history/retention before onboarding a real client.
+Never put lead records or credentials there. Moving real configs out of Git
+requires a code change because the current loader only supports repository
+configs.
+
+The current workflow does not call an external model. If a future adapter sends
+lead data to an external model provider, that transfer must be assessed and
+documented before real data is processed.
+
+See `docs/local-state.md` for the canonical runtime directory layout.
 
 ---
 
@@ -177,23 +224,26 @@ Constraints enforced by the schema validator:
 - Both values must be positive integers.
 - `delete_pii_after_days` must be >= `lead_retention_days`.
 
-The example client defaults are 365 days for lead retention and 730 days
-for PII deletion. Adjust these per client based on business need and any
-applicable legal requirements.
+The fictional example config uses 365 and 730 days. These are example values,
+not recommended legal or industry defaults. Select and document periods per
+client based on the actual purpose, business need, and applicable requirements.
 
 ### 4.2 Meaning of the Retention Fields
 
-**lead_retention_days:** The lead record (including status, classification,
-and follow-up schedule) should be kept for this many days after the lead was
-received. After this period the full record may be deleted.
+**lead_retention_days:** The configured target age, measured from receipt, at
+which the operator should review and delete or minimise the full lead record,
+unless a documented reason supports keeping it longer. It is not a minimum
+holding period.
 
-**delete_pii_after_days:** Even if the record is kept for business tracking
-purposes, PII fields (name, email, phone, message content) must be cleared
-or redacted after this many days.
+**delete_pii_after_days:** The configured outer target age, measured from
+receipt, by which PII must be removed from any lead or associated draft records
+that are still retained. Data may be deleted earlier. The schema requires this
+value to be at least `lead_retention_days`.
 
-In practice for the MVP, both actions (redaction and deletion) are performed
-manually by the operator using the procedure in section 5.1. No automated
-deletion script exists in the current version.
+These values are validated when loading config, but the workflow does not
+calculate due dates, notify the operator, redact data, or delete records. The
+operator must track and perform the actions manually using section 5.1. No
+automated deletion script exists in the current version.
 
 ### 4.3 Audit Log Retention
 
@@ -211,11 +261,12 @@ delivered to the client, whichever comes first.
 
 ### 4.5 Backup Retention
 
-Backups in `/var/openclaw/backups/` contain full copies of all JSONL files
-including personal data. Suggested policy:
-- Keep the last 4 weekly backups.
-- Keep one monthly backup for 12 months.
-- Delete older archives.
+Backups in `/var/openclaw/backups/` contain copies of client JSONL files,
+including personal data. Suggested baseline, matching the production runbook:
+keep at least the last four weekly backups (about 35 days) and delete older
+archives. This does not provide 12-month monthly backups; if a client needs
+longer retention, define and test a separate schedule before changing the
+cleanup command.
 
 See `runbooks/mac-mini-production.md` Section 7 for the backup procedure.
 
@@ -228,41 +279,58 @@ See `runbooks/mac-mini-production.md` Section 7 for the backup procedure.
 No automated deletion tool exists in the current MVP. To delete or redact
 a lead manually:
 
-1. Identify the lead ID from `list_leads` output.
-2. Open the relevant JSONL file (e.g. `/var/openclaw/clients/example-client/leads.jsonl`).
-3. JSONL files are one JSON object per line. Each line is a version of the
-   lead record (the last version with the matching `lead_id` is current).
-4. To redact: replace name, email, phone, and message fields with empty
-   strings or a placeholder such as `[redacted]`, and append the modified
-   record as a new line so the audit trail shows the change was made.
-5. To delete: remove all lines with the matching `lead_id` from all three
-   JSONL files (leads.jsonl, drafts.jsonl, audit.jsonl) using a text editor
-   or script.
-6. Record the action in your operator log (outside git) with the date, lead
-   ID, reason, and who performed the action.
+1. Record the request and date received, then identify the lead ID by checking
+   `leads.jsonl` for the contact details. `list_leads` shows lead ID, name, and
+   status; it does not search by email.
+2. Identify every related record in `drafts.jsonl` and `audit.jsonl` by lead ID.
+   Drafts may repeat personal data from the original enquiry.
+3. Take a protected backup before changing data. Treat it as live personal
+   data and delete temporary copies when the operation is verified.
+4. `leads.jsonl` contains the current snapshot, not a history of versions;
+   status updates rewrite the file. Redact or remove the matching record by
+   rewriting valid JSONL, not by appending a duplicate record.
+5. `drafts.jsonl` and `audit.jsonl` are append-only. Remove or redact all
+   matching draft records as required. Audit events reference the lead ID;
+   decide and record whether the applicable policy permits keeping those
+   pseudonymous events or requires removing them too. Removing audit events
+   affects the audit trail.
+6. Record the action in a restricted operator log with the date, lead ID,
+   reason, and who performed it. Verify the resulting files parse and contain
+   no data that should have been removed.
 
-> Take a backup before editing any JSONL file. JSONL files are append-only
-> by design; manual edits should be treated as exceptional operations.
+No supported deletion/redaction command exists. This manual procedure is
+error-prone and should be treated as an exceptional, checked operation; do not
+promise completion until state files, exports, backups, and any sent messages
+have been reviewed.
 
 ### 5.2 Handling a Subject Access or Deletion Request
 
 If a lead contacts you requesting access to or deletion of their data:
 
-1. Locate their records using `list_leads` and grep for their email.
-2. For an access request: compile all lines in leads.jsonl, drafts.jsonl,
-   and audit.jsonl that reference their lead ID. This is the full data held.
-3. For a deletion request: follow the procedure in section 5.1 to remove
+1. Record the date received and promptly escalate the request to the operator
+   and relevant client. Confirm identity only where reasonably necessary.
+2. Locate their records by checking lead contact fields in `leads.jsonl`;
+   `list_leads` does not search by email. Then locate associated draft and audit
+   records by lead ID.
+3. For an access request: compile all relevant records in `leads.jsonl`,
+   `drafts.jsonl`, and `audit.jsonl` that reference their lead ID. This is a
+   first-pass inventory, not necessarily all data held.
+4. For a deletion request: follow the procedure in section 5.1 to remove
    or redact all records referencing their lead ID.
-4. Check `/var/openclaw/exports/` for any exported files containing their
-   data and delete those exports.
-5. Check `/var/openclaw/backups/` -- backups may contain historical copies.
+5. Check `/var/openclaw/logs/` and `/var/openclaw/exports/` for records or
+   output containing their data; delete or redact as applicable.
+6. Check `/var/openclaw/backups/` -- backups may contain historical copies.
    Decide whether to delete or rotate the backup based on the request and
    legal advice.
-6. If you sent a Telegram notification about this lead, be aware that the
-   notification may persist in Telegram's servers. You cannot delete it
-   from Telegram directly from this system.
-7. Respond to the individual in writing confirming the action taken and the
-   date.
+7. If you sent a Telegram notification about this lead, it may persist in
+   Telegram's servers. This system has no message-deletion function; use
+   Telegram's own controls where available.
+8. Check any other systems actually used for this client. No OpenClaw/model
+   provider is called by the current implementation; reassess this step if an
+   external model adapter or other integration is enabled.
+9. Apply the response deadline and any exemptions that actually apply to the
+   request. Seek qualified advice if uncertain; do not promise completion until
+   the search and action have been verified.
 
 ### 5.3 Deleting Exports
 
@@ -327,9 +395,14 @@ accidentally sent to the wrong person or system:
    notified in the last run.
 3. **Record:** Log the incident with timestamp, affected leads (by ID), data
    exposed, recipient, and how it was discovered. Keep this log outside git.
-4. **Notify:** Depending on the severity and applicable law, you may be
-   required to notify affected individuals and/or the ICO (UK) within 72
-   hours. Get legal advice if unsure.
+4. **Notify:** Immediately alert the relevant client/controller. If acting as a
+   processor, notify the controller without undue delay. The controller must
+   assess whether the breach is notifiable; a notifiable UK GDPR breach must
+   generally be reported to the ICO without undue delay and, where feasible,
+   within 72 hours. Whether affected people must also be notified depends on
+   the risk. Follow the applicable contract and get qualified advice if unsure.
+   See the [ICO processor guidance](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/controllers-and-processors/controllers-and-processors/what-does-it-mean-if-you-are-a-processor/)
+   and [ICO breach guidance](https://ico.org.uk/for-organisations/report-a-breach/personal-data-breach/personal-data-breaches-a-guide/).
 5. **Fix:** Correct the configuration or process that caused the error before
    resuming operations.
 6. **Review:** After the incident, review whether any system change is needed
@@ -341,20 +414,21 @@ accidentally sent to the wrong person or system:
 
 The system applies two controls to limit personal data in Telegram messages:
 
-**1. Field selection:** Notifications include only name, a 300-character
-excerpt from the message, lead ID prefix, classification, and draft reply.
-Email and phone are not included in the formatted message.
+**1. Field selection:** Notifications include the lead name and a 300-character
+excerpt, but also classification details and the full draft reply, which can
+repeat personal data. Email and phone fields are not included directly.
 
-**2. Redaction regex:** The `redact_contact_details()` function strips email
-addresses and phone numbers from the message excerpt before it is sent.
+**2. Redaction regex:** The `redact_contact_details()` function strips detected
+email addresses and phone numbers from the original message excerpt only. It
+does not scan or redact the draft, classification, lead name, or other fields.
 
 **Current limits of these controls:**
 - Name is included and is not redacted.
 - The excerpt may contain other PII (addresses, NI numbers, account details)
   not caught by the email/phone regex.
 - Draft reply text may reference the lead's name or business context.
-- Telegram messages are stored on Telegram's servers; deletion from this
-  end is not possible after sending.
+- Telegram messages are stored on Telegram's servers. This system has no
+  message-deletion function; use Telegram's own controls where available.
 
 **Operator guidance:**
 - Only approve Telegram bot access for operator accounts you control.
@@ -404,14 +478,17 @@ a direct JSONL edit following section 5.1.
 
 **No customer-facing message is sent without explicit operator approval.**
 
-This is enforced at the schema level: `auto_send.first_reply` and
-`auto_send.followups` must both be `false` in the MVP. The schema validator
-rejects any config that sets either to `true`.
+This is enforced for customer-facing first replies and follow-ups at the schema
+level: `auto_send.first_reply` and `auto_send.followups` must both be `false` in
+the MVP. The schema validator rejects any config that sets either to `true`.
+The current assistant workflow is deterministic and local; no live OpenClaw
+model adapter is implemented.
 
 The approval workflow is:
 
 1. `process_new_leads` or `process_due_followups` generates a draft reply.
-2. `notify_approvals` sends the draft to the operator via Telegram for review.
+2. In live mode, `notify_approvals` sends the draft to the operator via
+   Telegram for review; in dry-run mode it prints the message locally.
 3. The operator reads the draft and decides whether to send it, edit it, or
    discard it.
 4. The operator sends the approved reply through the client's normal channel
@@ -434,10 +511,10 @@ The following checks should be performed before onboarding a new client:
 - [ ] config.auto_send.followups is false.
 - [ ] Real approval contacts (Telegram chat ID) are set in secrets, not in
       config.yaml.
-- [ ] The client has been informed that their customers' enquiries are
-      processed by an AI assistant and reviewed by a human operator.
-- [ ] The client's website privacy notice covers AI-assisted lead handling
-      (get legal review).
+- [ ] The client has been informed which systems process enquiries and that
+      customer-facing replies are reviewed and sent by a human operator.
+- [ ] The website privacy notice accurately describes current processing.
+      Update it before enabling external AI/model processing; get legal review.
 - [ ] Backup schedule is in place and tested.
 - [ ] Export and backup retention dates are documented.
 
@@ -457,7 +534,9 @@ covering at minimum:
   data on your own account)
 - Lawful basis for processing enquiry messages
 - Data processing agreements with clients
-- Third-party sub-processor obligations (Openclaw, Telegram)
+- Third-party processing and sub-processor obligations (currently GitHub for
+  repository/config data and Telegram for live notifications; OpenClaw or a
+  model provider only if a future adapter is enabled)
 - Subject access and erasure request obligations and timescales
 - Breach notification obligations under Article 33 UK GDPR
 

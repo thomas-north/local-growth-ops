@@ -52,6 +52,14 @@ The structure is:
 | Backups | `/var/openclaw/backups/` | **Never** |
 | Secrets / tokens | `/var/openclaw/secrets/*.env` | **Never** |
 
+The example config is fictional. The current config loader reads client configs
+from this repository, and real business names, direct contact details, or
+locations may be personal data (especially for sole traders). Keep repository
+access restricted, minimise real config fields, and review repository history
+and retention before onboarding a real client. The private repository is not a
+secrets vault; never commit lead records or credentials. See
+`docs/privacy-retention-safety.md`.
+
 ## Backup
 
 Back up `/var/openclaw/` on a regular schedule (weekly minimum). The repo
@@ -62,12 +70,15 @@ See `runbooks/mac-mini-production.md` Section 7 for the full backup procedure.
 
 ## Retention
 
-Retention periods for lead records and PII fields are configured per client in
-`clients/<slug>/config.yaml` under the `retention` key:
+Retention target periods for lead records and PII fields are recorded per
+client in `clients/<slug>/config.yaml` under the `retention` key:
 
 - `lead_retention_days`: how long to keep full lead records
 - `delete_pii_after_days`: how long before name/email/phone/message must be
   cleared (must be >= lead_retention_days)
+
+The schema validates these values, but no workflow currently enforces them or
+automatically deletes/redacts records; the operator must track and apply them.
 
 For deletion procedures, subject access requests, and backup retention rules,
 see `docs/privacy-retention-safety.md`.

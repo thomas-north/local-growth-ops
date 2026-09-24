@@ -583,7 +583,13 @@ LOCAL_GROWTH_STATE_ROOT="$TMP" python3.11 -m lead_hub.process_new_leads \
 LOCAL_GROWTH_STATE_ROOT="$TMP" python3.11 -m lead_hub.weekly_report <new-slug>
 ```
 
-### Step 5 -- Commit the Config
+### Step 5 -- Review and Commit the Config
+
+The current config loader requires this file to be in the repository. Before
+committing a real client's config, minimise personal details and confirm that
+repository access and history retention are appropriate. A private repository
+is not a secrets vault. Never put lead records, credentials, or tokens in the
+config or Git.
 
 ```bash
 git add clients/<new-slug>/config.yaml

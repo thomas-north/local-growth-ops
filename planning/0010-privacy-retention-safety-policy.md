@@ -118,6 +118,17 @@ rg -n "TELEGRAM_BOT_TOKEN\s*=|chat_id\s*=\s*\"-?[0-9]|password|secret|token|api[
 - lead_hub/README.md: added Data Handling section cross-referencing privacy doc.
 - README.md: added privacy-retention-safety.md to repo structure, updated
   development status (plan 0010 complete), reduced remaining backlog to item 11.
+- Reviewer corrections before merge: distinguished local deterministic processing
+  and file-based intake (no live site endpoint) from the not-yet-implemented
+  live OpenClaw adapter;
+  documented Git-hosted real client config risk, full Telegram draft contents,
+  stdout/log and input-payload copies, actual JSONL rewrite/append semantics,
+  non-enforced retention targets, and backup coverage/retention limits.
+- README.md now distinguishes the intended service flow from implemented
+  functionality. The Mac mini onboarding runbook warns that real configs are
+  stored in the private Git repository.
+- Added official ICO processor and breach guidance links to the incident
+  procedure. The document remains operational guidance, not legal advice.
 - Verification: python3.11 3.11.15, pytest 336 passed, compileall clean,
   end-to-end dry-run passed, stale-reference grep clean, safety grep clean
   (all matches are documentation, planning patterns, or test fixtures with
