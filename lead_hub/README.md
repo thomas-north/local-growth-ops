@@ -162,7 +162,17 @@ on the Mac mini. This path is outside this git repository and is never committed
 See `docs/local-state.md` for the full directory layout and alternative dev
 paths.
 
+## Data Handling
+
+Lead records (names, emails, phone numbers, message content) are personal
+data. They are stored only in JSONL files on the Mac mini and are never
+committed to git.
+
+For data categories, retention periods, deletion procedures, and subject
+access/deletion request handling, see `docs/privacy-retention-safety.md`.
+
 ## What Does Not Belong Here
 
 - Openclaw prompt text → `openclaw/agents/followup-assistant/`
 - Operator runbooks → `runbooks/`
+- Privacy and retention policy → `docs/privacy-retention-safety.md`

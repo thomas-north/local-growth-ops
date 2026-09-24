@@ -21,18 +21,21 @@ Create a repeatable assistant model that can:
 - send operator approval messages
 - produce weekly lead reports
 
-The MVP is supervised. Openclaw drafts and schedules; a human approves before
-anything sensitive or customer-facing is sent.
+The target MVP is supervised: a draft is reviewed by a human before anything
+customer-facing is sent. The current repository uses a deterministic local
+drafting workflow; the live Openclaw adapter is not implemented yet.
 
 ## Hosting Model
 
-Openclaw will run centrally on the dedicated Mac mini.
+The planned Openclaw integration will run centrally on the dedicated Mac mini.
+The current scripts can process local lead data, but do not receive a live
+website submission or call Openclaw.
 
 Clients do not host this system. They interact through normal channels such as
 email, Telegram, WhatsApp, or simple approval messages, depending on the package
 we offer them.
 
-Default model:
+Intended service flow (not yet fully implemented):
 
 - client website sends leads into this ops system
 - Openclaw monitors leads on a schedule
@@ -57,6 +60,7 @@ tests/                      validation and workflow tests
 docs/
   OVERALL_PLAN.md           phased implementation plan
   local-state.md            where live operational data lives outside git
+  privacy-retention-safety.md  privacy, retention, and safety policy for lead handling
 planning/                   executable implementation plans (Codex writes, Claude Code executes)
 ```
 
@@ -107,9 +111,11 @@ The assistant must:
   `weekly_report` command, exclusion rules, 43-test suite.
 - Plan 0009 complete: Mac mini production runbook covering setup, daily workflow,
   Telegram, backup, reboot recovery, client management, checklists, troubleshooting.
+- Plan 0010 complete: privacy, retention, and safety policy covering data categories,
+  where data lives, retention config, deletion procedures, Telegram PII minimisation,
+  escalation rules, human-approval policy, and legal-review guidance.
 
 Remaining backlog:
-10. Privacy, retention, and safety policy.
 11. External-agent implementation brief.
 
 See [docs/OVERALL_PLAN.md](docs/OVERALL_PLAN.md) for the full phased plan.
